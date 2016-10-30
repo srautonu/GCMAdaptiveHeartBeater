@@ -4,7 +4,7 @@ android {
     compileSdkVersion 24
     buildToolsVersion "24.0.3"
     defaultConfig {
-        applicationId "com.research.ton.newandroidapp"
+        applicationId "com.gcmadaptiveheartbeater.android"
         minSdkVersion 10
         targetSdkVersion 24
         versionCode 1
