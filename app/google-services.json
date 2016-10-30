@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "109246251326",
+    "firebase_url": "https://newandroidapp-4867c.firebaseio.com",
+    "project_id": "newandroidapp-4867c",
+    "storage_bucket": "newandroidapp-4867c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:109246251326:android:c4fe41a94e615cd3",
+        "android_client_info": {
+          "package_name": "com.research.ton.newandroidapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "109246251326-sohj0uv7ruqdv90sqsr3794qoiek1kn7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.research.ton.newandroidapp",
+            "certificate_hash": "EAE39546FBB40B5E9BE1706A3265169973C6A188"
+          }
+        },
+        {
+          "client_id": "109246251326-p90tvfh7l760vgms2maparmr4c7oqa1j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-H-aT_5rYkIo6jvzPd65yhXfWPSPemYE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "109246251326-p90tvfh7l760vgms2maparmr4c7oqa1j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
