@@ -26,9 +26,9 @@ public class NotificationStats extends Fragment {
     // Note: The categories names here must be exactly same as used
     // in the NotificationPusher component.
     //
-    final String[] _rgStrAppName = { "Messenger", "Mail", "Social", "Calendar" };
+    final String[] _rgStrCategory = { "Messenger", "Mail", "Social", "Calendar" };
 
-    String[] _rgStrNoticationInfo = _rgStrAppName.clone();
+    String[] _rgStrNoticationInfo = _rgStrCategory.clone();
     private ListView _notificationList;
     ArrayAdapter _notificationListAdapter;
     NotificationBroadcastReceiver _notificationReceiver;
@@ -68,10 +68,10 @@ public class NotificationStats extends Fragment {
     void updateNotificationCount()
     {
         SharedPreferences settings = getContext().getSharedPreferences(Constants.SETTINGS_FILE, 0);
-        for (int i = 0; i < _rgStrAppName.length; i++)
+        for (int i = 0; i < _rgStrCategory.length; i++)
         {
-            int notifCount = settings.getInt(_rgStrAppName[i], 0);
-            _rgStrNoticationInfo[i] = _rgStrAppName[i] + " (" + notifCount + ")";
+            int notifCount = settings.getInt(_rgStrCategory[i], 0);
+            _rgStrNoticationInfo[i] = _rgStrCategory[i] + " (" + notifCount + ")";
         }
         _notificationListAdapter.notifyDataSetChanged();
     }

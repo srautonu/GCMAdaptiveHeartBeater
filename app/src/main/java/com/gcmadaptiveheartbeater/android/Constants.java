@@ -14,7 +14,7 @@ public class Constants {
     // NOTE: For each of the notification app types (email/social etc.) we
     // have a settings (count) with the corresponding name. When you add a
     // new settings, make sure to avoid the names specified in
-    // NotificationStats._rgStrAppName
+    // NotificationStats._rgStrCategory
     //
 
     //
