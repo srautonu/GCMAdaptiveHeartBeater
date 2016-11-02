@@ -32,7 +32,7 @@ public class NotificationHandler extends FirebaseMessagingService {
     public void onMessageReceived(RemoteMessage remoteMessage)
     {
         Map<String, String> data = remoteMessage.getData();
-        String strType = data.get("AppName");
+        String strType = data.get("Category");
         int notificationId = Integer.parseInt(data.get("NotificationId"));
 
         Log.d(TAG, "From: " + remoteMessage.getFrom());
