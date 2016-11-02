@@ -23,13 +23,10 @@ import com.gcmadaptiveheartbeater.android.BackGroundServices.NotificationHandler
 
 public class NotificationStats extends Fragment {
     //
-    // Note: The application names here must be exactly same as used
+    // Note: The categories names here must be exactly same as used
     // in the NotificationPusher component.
     //
-    final String[] _rgStrAppName = {
-            "WhatsApp", "Gmail", "SMS/MMS", "Facebook", "Facebook Messanger", "Email", "Google Calendar",
-            "To-Do List", "Google Plus", "Calendar"
-    };
+    final String[] _rgStrAppName = { "Messenger", "Mail", "Social", "Calendar" };
 
     String[] _rgStrNoticationInfo = _rgStrAppName.clone();
     private ListView _notificationList;
