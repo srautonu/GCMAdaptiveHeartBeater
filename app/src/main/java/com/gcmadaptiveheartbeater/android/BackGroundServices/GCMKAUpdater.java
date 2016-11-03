@@ -11,6 +11,9 @@ import android.support.v4.content.LocalBroadcastManager;
 import com.gcmadaptiveheartbeater.android.Constants;
 import com.gcmadaptiveheartbeater.android.Utilities;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Created by mrahman on 24-Oct-16.
  */
@@ -31,7 +34,11 @@ public class GCMKAUpdater extends BroadcastReceiver
         //
         // We are about to send GCM KA. Update the counter.
         //
-        Utilities.incrementSetting(pref, Constants.GCM_KA_COUNT);
+        Utilities.incrementSetting(context, Constants.GCM_KA_COUNT);
+        Utilities.updateSetting(context, Constants.GCM_KA_TIMESTAMP,
+            new SimpleDateFormat("MM/dd/yyyy h:mm:ss a").format(new Date())
+        );
+
 
         System.out.println("Sending GCM KA.");
         context.sendBroadcast(gTalkHeartBeatIntent);

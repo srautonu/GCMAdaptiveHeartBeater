@@ -53,7 +53,7 @@ public class NotificationStats extends Fragment {
 
         LocalBroadcastManager.getInstance(getContext()).registerReceiver(
             _notificationReceiver,
-            new IntentFilter(NotificationHandler.PREFS_NAME)
+            new IntentFilter(Constants.SETTINGS_UPDATED_INTENT)
             );
 
         updateNotificationCount();

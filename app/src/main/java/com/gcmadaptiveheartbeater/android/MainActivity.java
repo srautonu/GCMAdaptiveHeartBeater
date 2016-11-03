@@ -49,12 +49,14 @@ public class MainActivity extends FragmentActivity {
 
         setContentView(R.layout.viewpager);
 
-        List<Fragment> fragments = new Vector<Fragment>();
-        fragments.add(Fragment.instantiate(this, Commands.class.getName()));
-        fragments.add(Fragment.instantiate(this, NotificationStats.class.getName()));
-        fragments.add(Fragment.instantiate(this, KAStats.class.getName()));
+        //Fragment.instantiate(this, Commands.class.getName()));
 
-        _pagerAdapter = new PagerAdapter(getSupportFragmentManager(), fragments);
+        List<String> rgFragmentNames = new Vector<String>();
+        rgFragmentNames.add(Commands.class.getName());
+        rgFragmentNames.add(NotificationStats.class.getName());
+        rgFragmentNames.add(KAStats.class.getName());
+
+        _pagerAdapter = new PagerAdapter(this, rgFragmentNames);
         ViewPager pager = (ViewPager) super.findViewById(R.id.viewpager);
         pager.setAdapter(_pagerAdapter);
 
@@ -68,20 +70,22 @@ public class MainActivity extends FragmentActivity {
 }
 
 class PagerAdapter extends FragmentPagerAdapter {
-    private List<Fragment> _fragments;
+    private final Context _context;
+    private List<String> _rgStrfragmentClassName;
 
-    public PagerAdapter(FragmentManager fm, List<Fragment> fragments) {
-        super(fm);
-        _fragments = fragments;
+    public PagerAdapter(FragmentActivity activity, List<String> strfragmentClassName) {
+        super(activity.getSupportFragmentManager());
+        _context = activity;
+        _rgStrfragmentClassName = strfragmentClassName;
     }
 
     @Override
     public Fragment getItem(int position) {
-        return _fragments.get(position);
+        return Fragment.instantiate(_context, _rgStrfragmentClassName.get(position));
     }
 
     @Override
     public int getCount() {
-        return _fragments.size();
+        return _rgStrfragmentClassName.size();
     }
 }

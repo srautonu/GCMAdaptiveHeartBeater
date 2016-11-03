@@ -3,6 +3,12 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/deviceId"
+        android:textAppearance="@style/TextAppearance.AppCompat.Button" />
+
     <Button
         android:text="Start/End Experiment"
         android:layout_width="match_parent"
@@ -11,3 +17,4 @@
         />
 
 </LinearLayout>
+

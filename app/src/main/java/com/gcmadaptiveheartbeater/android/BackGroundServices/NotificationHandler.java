@@ -20,8 +20,6 @@ import static com.google.android.gms.internal.zzs.TAG;
 
 public class NotificationHandler extends FirebaseMessagingService {
 
-    public static final String PREFS_NAME = "com.gcmadaptiveheartbeater.android.NOTIFICATION_COUNT";
-
     //
     // FCM messages are handled here.
     // If the application is in the foreground handle both data and notification messages here.
@@ -42,12 +40,6 @@ public class NotificationHandler extends FirebaseMessagingService {
         //
         // Update the count in shared preference API
         //
-        SharedPreferences settings = getSharedPreferences(Constants.SETTINGS_FILE, 0);
-        Utilities.incrementSetting(settings, strType);
-
-        Intent localIntent = new Intent(PREFS_NAME);
-
-        // Broadcasts the Intent to receivers in this app.
-        LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
+        Utilities.incrementSetting(this, strType);
     }
 }

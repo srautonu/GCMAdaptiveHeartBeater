@@ -29,11 +29,10 @@
             android:name=".BackGroundServices.KATesterService"
             android:exported="false" >
         </service>
-        <receiver
-            android:name=".BackGroundServices.GCMKAUpdater"
-            android:process=":remote" >
+        <receiver android:name=".BackGroundServices.GCMKAUpdater">
         </receiver>
     </application>
     
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
 </manifest>

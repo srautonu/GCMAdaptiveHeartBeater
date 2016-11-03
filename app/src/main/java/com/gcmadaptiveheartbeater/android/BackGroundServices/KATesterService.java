@@ -9,6 +9,8 @@ import com.gcmadaptiveheartbeater.android.Utilities;
 
 import java.io.*;
 import java.net.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 //  kopottakha.cs.uiuc.edu:8080
 
@@ -17,7 +19,7 @@ import java.net.*;
  */
 public class KATesterService extends IntentService
 {
-    String m_strServerDNS = "kopottakha.cs.uiuc.edu"; //"172.20.33.3" ;//"localhost";
+    String m_strServerDNS = "www.ekngine.com";
     int m_serverPort = 8080;
 
     Socket m_sock;
@@ -39,7 +41,6 @@ public class KATesterService extends IntentService
         int lkgKA, lkbKA;
 
         SharedPreferences settings = getSharedPreferences(Constants.SETTINGS_FILE, 0);
-
         lkgKA = settings.getInt(Constants.LKG_KA, 1 /* default lkg */);
         lkbKA = settings.getInt(Constants.LKB_KA, 33 /* default lkb */);
         Log("Read from settings: LKG_KA: " + lkgKA + " minutes, " + "LKB_KA: " + lkbKA + " minutes.");
@@ -48,7 +49,9 @@ public class KATesterService extends IntentService
         m_tester.InitTest(lkgKA, lkbKA);
 
         try {
+            //System.currentTimeMillis()
             while (false == m_tester.IsCompleted()) {
+
                 int delay = m_tester.GetNextIntervalToTest();
 
                 if (!IsChannelOpen()) {
@@ -68,7 +71,7 @@ public class KATesterService extends IntentService
                     //
                     // We are about to send a KA. Increment the test KA counter
                     //
-                    Utilities.incrementSetting(getSharedPreferences(Constants.SETTINGS_FILE, 0), Constants.TEST_KA_COUNT);
+                    Utilities.incrementSetting(this, Constants.TEST_KA_COUNT);
 
                     m_outToServer.writeBytes("PING TEST\n");
                     Log("sent> PING TEST\n");
@@ -103,16 +106,23 @@ public class KATesterService extends IntentService
                 // be updated in the settings. Otherwise, update LKB KA
                 //
                 if (fKASuccess) {
-                    Utilities.updateSetting(settings, Constants.LKG_KA, delay);
+                    Utilities.updateSetting(this, Constants.LKG_KA, delay);
                     Log("Updated settings with new LKG KA: " + delay);
                 }
                 else
                 {
-                    Utilities.updateSetting(settings, Constants.LKB_KA, delay);
+                    Utilities.updateSetting(this, Constants.LKB_KA, delay);
                     Log("Updated settings with new LKB KA: " + delay);
                 }
 
+                Utilities.updateSetting(this, Constants.TEST_KA_TIMESTAMP,
+                    new SimpleDateFormat("MM/dd/yyyy h:mm:ss a").format(new Date())
+                    );
+
+
                 Log("LKG KA Interval is " + m_tester.GetLKGInterval() + " minutes.\n");
+
+
             }
         }
         catch (Exception e)

@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
@@ -25,17 +26,15 @@ import com.gcmadaptiveheartbeater.android.BackGroundServices.NotificationHandler
 
 public class KAStats extends Fragment {
     final String[] _rgStrKAInfoLabel = {
-            "LKG KA Interval",
-            "LKB KA Interval",
-            "Convergence Time",
-            "Test KA Count",
-            "GCM KA Count",
-            "Connected",
-            "Type",
-            "Subtype",
-            "APN/SSID",
-            "MNC/BSSID",
-            "MCC"
+        "LKG KA Interval",
+        "LKB KA Interval",
+        "Test KA Count",
+        "GCM KA Count",
+        "Test KA TS",
+        "GCM KA TS",
+        "Connected",
+        "Type",
+        "APN/SSID",
     };
 
     String[] _rgStrKAInfo = _rgStrKAInfoLabel.clone();
@@ -49,6 +48,16 @@ public class KAStats extends Fragment {
         _kaInfoListAdapter = new ArrayAdapter<String>(getContext(), R.layout.listview_item, _rgStrKAInfo);
         _kaInfoList = (ListView) view.findViewById(R.id.listview);
         _kaInfoList.setAdapter(_kaInfoListAdapter);
+
+        LocalBroadcastManager.getInstance(getContext()).registerReceiver(
+                new BroadcastReceiver()
+                {
+                    public void onReceive(Context context, Intent intent) {
+                        updateKAStats();
+                    }
+                },
+                new IntentFilter(Constants.SETTINGS_UPDATED_INTENT)
+        );
 
         return view;
     }
@@ -68,19 +77,25 @@ public class KAStats extends Fragment {
         final String[] strTag = {
                 Constants.LKG_KA,
                 Constants.LKB_KA,
-                Constants.CT_KA,
                 Constants.TEST_KA_COUNT,
-                Constants.GCM_KA_COUNT
+                Constants.GCM_KA_COUNT,
+                Constants.TEST_KA_TIMESTAMP,
+                Constants.GCM_KA_TIMESTAMP
         };
+
+        if (null == getContext())
+            return;
 
         SharedPreferences settings = getContext().getSharedPreferences(Constants.SETTINGS_FILE, 0);
 
         //for (int i = 0; i < _rgStrKAInfo.length; i++)
         int i;
-        for (i = 0; i < 5; i++)
+        for (i = 0; i < 6; i++)
         {
-            int value = settings.getInt(strTag[i], -1);
-            _rgStrKAInfo[i] = _rgStrKAInfoLabel[i] + " (" + value + ")";
+            if (i < 4)
+                _rgStrKAInfo[i] = _rgStrKAInfoLabel[i] + " (" + settings.getInt(strTag[i], -1) + ")";
+            else
+                _rgStrKAInfo[i] = _rgStrKAInfoLabel[i] + " (" + settings.getString(strTag[i], "") + ")";
         }
 
         ConnectivityManager cm = (ConnectivityManager)getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -91,9 +106,6 @@ public class KAStats extends Fragment {
         i++;
 
         _rgStrKAInfo[i] = _rgStrKAInfoLabel[i] + " (" + activeNetwork.getTypeName() + ")";
-        i++;
-
-        _rgStrKAInfo[i] = _rgStrKAInfoLabel[i] + " (" + activeNetwork.getSubtypeName() + ")";
         i++;
 
         if (activeNetwork.isConnectedOrConnecting()) {
@@ -111,21 +123,12 @@ public class KAStats extends Fragment {
 
                 _rgStrKAInfo[i] = _rgStrKAInfoLabel[i] + " (" + c.getString(c.getColumnIndex("apn")) + ")";
                 i++;
-
-                _rgStrKAInfo[i] = _rgStrKAInfoLabel[i] + " (" + c.getString(c.getColumnIndex("mnc")) + ")";
-                i++;
-
-                _rgStrKAInfo[i] = _rgStrKAInfoLabel[i] + " (" + c.getString(c.getColumnIndex("mcc")) + ")";
-                i++;
             } else if (1 == networkType) {
                 // type 1 means WIFI connection
                 WifiManager wifiManager = (WifiManager) getContext().getSystemService(Context.WIFI_SERVICE);
                 WifiInfo wifiInfo = wifiManager.getConnectionInfo();
 
                 _rgStrKAInfo[i] = _rgStrKAInfoLabel[i] + " (" + wifiInfo.getSSID() + ")";
-                i++;
-
-                _rgStrKAInfo[i] = _rgStrKAInfoLabel[i] + " (" + wifiInfo.getBSSID() + ")";
                 i++;
             }
         }
