@@ -17,7 +17,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.gcmadaptiveheartbeater.android.BackGroundServices.GCMKAUpdater;
 import com.gcmadaptiveheartbeater.android.BackGroundServices.KATesterService;
 
 
@@ -34,6 +33,19 @@ public class Commands extends Fragment {
         "Start Experiment",
         "End Experiment"
     };
+
+    private void setupMocks()
+    {
+        SharedPreferences.Editor editor = getContext().getSharedPreferences(Constants.SETTINGS_FILE, 0).edit();
+
+//        editor.putInt(Constants.LKG_KA, 1);
+//        editor.putInt(Constants.LKB_KA, 2);
+//        editor.putBoolean(Constants.EXP_IN_PROGRESS, true);
+
+        editor.putInt(Constants.EXP_MODEL, 3);
+
+        editor.commit();
+    }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -67,9 +79,13 @@ public class Commands extends Fragment {
 
                     if (Utilities.isExperimentRunning(pref))
                     {
+
                         //
                         // If experiment is already running, a click performs stop action
                         //
+                        Intent mServiceIntent = new Intent(getContext(), KATesterService.class);
+                        getContext().stopService(mServiceIntent);
+
                         Utilities.setExperimentRunning(pref, false);
                     }
                     else // start experiment
@@ -78,6 +94,8 @@ public class Commands extends Fragment {
                         // Clear all cached settings
                         //
                         pref.edit().clear().commit();
+
+                        setupMocks();
 
                         //
                         // Mark experiment running
@@ -89,25 +107,22 @@ public class Commands extends Fragment {
                         // Model #2: Agressive GCM KA (1 minute). No KA Testing
                         // Model #3: KA testing. GCM Adaptive KA
                         //
-
-                        //
-                        // Start KA interval testing
-                        //
-                        Intent mServiceIntent = new Intent(getContext(), KATesterService.class);
-                        getContext().startService(mServiceIntent);
-
-                        //
-                        // Start GCM KA alarm
-                        //
-                        scheduleAlarm();
-                    }
+                        int expModel = Utilities.getExpModel(getContext());
+                        if (expModel >= 2)
+                        {
+                            startGCMKA();
+                        }
+                        if (expModel == 3)
+                        {
+                            startTestKA();
+                        }
+                  }
                 }
             }
         );
 
         return view;
     }
-
 
     private String getAccount()
     {
@@ -126,19 +141,29 @@ public class Commands extends Fragment {
         }
     }
 
-    // Setup a recurring alarm for sending GCM KA
-    private void scheduleAlarm()
+    // request a GCM KA immediately
+    private void startGCMKA()
     {
-        // Construct an intent that will execute the AlarmReceiver
-        Intent intent = new Intent(getContext(), GCMKAUpdater.class);
-
-        // Create a PendingIntent to be triggered when the alarm goes off
-        final PendingIntent pIntent = PendingIntent.getBroadcast(getContext(), 0 /* request code */, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
         AlarmManager alarm = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
 
         // Set up an alarm for immediate trigger
-        alarm.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), pIntent);
+        alarm.set(
+            AlarmManager.RTC_WAKEUP,
+            System.currentTimeMillis(),
+            PendingIntent.getBroadcast(getContext(), 0, new Intent(Constants.ACTION_SEND_GCM_KA), PendingIntent.FLAG_UPDATE_CURRENT)
+        );
+    }
+
+    private void startTestKA()
+    {
+        AlarmManager alarm = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
+
+        // Set up an alarm for immediate trigger
+        alarm.set(
+                AlarmManager.RTC_WAKEUP,
+                System.currentTimeMillis(),
+                PendingIntent.getBroadcast(getContext(), 0, new Intent(Constants.ACTION_START_KA_TESTING), PendingIntent.FLAG_UPDATE_CURRENT)
+        );
     }
 }
 

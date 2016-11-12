@@ -56,7 +56,7 @@ public class KAStats extends Fragment {
                         updateKAStats();
                     }
                 },
-                new IntentFilter(Constants.SETTINGS_UPDATED_INTENT)
+                new IntentFilter(Constants.ACTION_HANDLE_SETTINGS_UPDATE)
         );
 
         return view;
@@ -108,7 +108,7 @@ public class KAStats extends Fragment {
         _rgStrKAInfo[i] = _rgStrKAInfoLabel[i] + " (" + activeNetwork.getTypeName() + ")";
         i++;
 
-        if (activeNetwork.isConnectedOrConnecting()) {
+        if (isConnected) {
             //
             // Get the type of network
             //  0 --> mobile

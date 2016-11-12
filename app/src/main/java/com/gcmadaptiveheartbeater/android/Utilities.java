@@ -15,6 +15,18 @@ public class Utilities {
         return pref.getBoolean(Constants.EXP_IN_PROGRESS, false);
     }
 
+    public static int getExpModel(Context context)
+    {
+        //
+        // Model #1: Android as is. No KA testing, No additional GCM KA
+        // Model #2: Agressive GCM KA (1 minute). No KA Testing
+        // Model #3: KA testing. GCM Adaptive KA
+        //
+        // Default to Model 3 (Adaptive KA)
+        //
+        return context.getSharedPreferences(Constants.SETTINGS_FILE, 0).getInt(Constants.EXP_MODEL, 3);
+    }
+
     public static void setExperimentRunning(SharedPreferences pref, boolean fRunning)
     {
         SharedPreferences.Editor editor = pref.edit();
@@ -39,7 +51,7 @@ public class Utilities {
         editor.putInt(strName, value);
         editor.commit();
 
-        LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(Constants.SETTINGS_UPDATED_INTENT));
+        LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(Constants.ACTION_HANDLE_SETTINGS_UPDATE));
     }
 
     public static void updateSetting(Context context, String strName, String value)
@@ -53,7 +65,7 @@ public class Utilities {
         editor.putString(strName, value);
         editor.commit();
 
-        LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(Constants.SETTINGS_UPDATED_INTENT));
+        LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(Constants.ACTION_HANDLE_SETTINGS_UPDATE));
     }
 
 }

@@ -5,13 +5,25 @@ package com.gcmadaptiveheartbeater.android;
  */
 
 public class Constants {
+
+    //
+    // Intent/action names
+    //
+    public final static String ACTION_SEND_GCM_KA            = "com.gcmadaptiveheartbeater.android.SEND_GCM_KA";
+    public final static String ACTION_SEND_TEST_KA           = "com.gcmadaptiveheartbeater.android.SEND_TEST_KA";
+    public final static String ACTION_START_KA_TESTING       = "com.gcmadaptiveheartbeater.android.START_KA_TESTING";
+
+    public final static String ACTION_HANDLE_SETTINGS_UPDATE = "com.gcmadaptiveheartbeater.android.HANDLE_SETTINGS_UPDATE";
+
     //
     // Name of the settings file. This is used from activity as well as services
     //
     public final static String SETTINGS_FILE = "com.gcmadaptiveheartbeater.android";
 
-    public final static String SETTINGS_UPDATED_INTENT = "com.gcmadaptiveheartbeater.android.NOTIFY_SETTINGS_UPDATED";
 
+    //
+    // Settings names
+    //
     //
     // NOTE: For each of the notification app types (email/social etc.) we
     // have a settings (count) with the corresponding name. When you add a
@@ -20,6 +32,9 @@ public class Constants {
     //
 
     public final static String DEVICE_NAME = "deviceName";
+
+    public final static String EXP_MODEL = "expModel";
+
 
     //
     // Last known good keep-alive interval (in minutes)

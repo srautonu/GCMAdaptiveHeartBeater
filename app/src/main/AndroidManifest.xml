@@ -25,12 +25,22 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-        <service
-            android:name=".BackGroundServices.KATesterService"
-            android:exported="false" >
+        <service android:name=".BackGroundServices.KATesterService" android:exported="false" >
+            <intent-filter>
+                <action android:name="com.gcmadaptiveheartbeater.android.START_KA_TESTING" />
+                <action android:name="com.gcmadaptiveheartbeater.android.SEND_TEST_KA" />
+            </intent-filter>
         </service>
         <receiver android:name=".BackGroundServices.GCMKAUpdater">
+            <intent-filter>
+                <action android:name="com.gcmadaptiveheartbeater.android.SEND_GCM_KA" />
+                <action android:name="com.gcmadaptiveheartbeater.android.START_KA_TESTING" />
+                <action android:name="com.gcmadaptiveheartbeater.android.SEND_TEST_KA" />
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
         </receiver>
+
+
     </application>
     
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />

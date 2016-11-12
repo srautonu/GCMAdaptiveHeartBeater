@@ -25,31 +25,11 @@ public class MainActivity extends FragmentActivity {
 
     private PagerAdapter _pagerAdapter;
 
-    private void setupMocks()
-    {
-        SharedPreferences.Editor editor = getSharedPreferences(Constants.SETTINGS_FILE, 0).edit();
-
-        editor.putInt(Constants.LKG_KA, 16);
-        editor.putInt(Constants.LKB_KA, 32);
-        editor.putInt(Constants.TEST_KA_COUNT, 5);
-        editor.putInt(Constants.GCM_KA_COUNT, 10);
-
-        editor.commit();
-
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //
-        // DEBUG HOOK
-        //
-        //setupMocks();
-
         setContentView(R.layout.viewpager);
-
-        //Fragment.instantiate(this, Commands.class.getName()));
 
         List<String> rgFragmentNames = new Vector<String>();
         rgFragmentNames.add(Commands.class.getName());
@@ -59,6 +39,7 @@ public class MainActivity extends FragmentActivity {
         _pagerAdapter = new PagerAdapter(this, rgFragmentNames);
         ViewPager pager = (ViewPager) super.findViewById(R.id.viewpager);
         pager.setAdapter(_pagerAdapter);
+
 
         //
         // Make notification info page the primary page, when we are already
