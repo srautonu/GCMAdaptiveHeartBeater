@@ -9,6 +9,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v4.content.WakefulBroadcastReceiver;
 
+import com.gcmadaptiveheartbeater.android.BuildConfig;
 import com.gcmadaptiveheartbeater.android.Constants;
 import com.gcmadaptiveheartbeater.android.Utilities;
 
@@ -127,7 +128,7 @@ public class GCMKAUpdater extends WakefulBroadcastReceiver
 
     private void sendTestKA(Context context)
     {
-        startWakefulService(context, new Intent(Constants.ACTION_SEND_TEST_KA));
+        startWakefulService(context, new Intent(Constants.ACTION_SEND_TEST_KA).setPackage(BuildConfig.APPLICATION_ID));
     }
 
     private void scheduleTestKA(Context context, int delayM)
@@ -138,7 +139,7 @@ public class GCMKAUpdater extends WakefulBroadcastReceiver
         //
         if (delayM < 0)
         {
-            startWakefulService(context, new Intent(Constants.ACTION_START_KA_TESTING));
+            startWakefulService(context, new Intent(Constants.ACTION_START_KA_TESTING).setPackage(BuildConfig.APPLICATION_ID));
         }
         else
         {
