@@ -79,12 +79,13 @@ public class Commands extends Fragment {
 
                     if (Utilities.isExperimentRunning(pref))
                     {
-
                         //
                         // If experiment is already running, a click performs stop action
                         //
                         Intent mServiceIntent = new Intent(getContext(), KATesterService.class);
                         getContext().stopService(mServiceIntent);
+
+                        stopGCMKA();
 
                         Utilities.setExperimentRunning(pref, false);
                     }
@@ -150,6 +151,14 @@ public class Commands extends Fragment {
         alarm.set(
             AlarmManager.RTC_WAKEUP,
             System.currentTimeMillis(),
+            PendingIntent.getBroadcast(getContext(), 0, new Intent(Constants.ACTION_SEND_GCM_KA), PendingIntent.FLAG_UPDATE_CURRENT)
+        );
+    }
+
+    private void stopGCMKA()
+    {
+        AlarmManager alarm = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
+        alarm.cancel(
             PendingIntent.getBroadcast(getContext(), 0, new Intent(Constants.ACTION_SEND_GCM_KA), PendingIntent.FLAG_UPDATE_CURRENT)
         );
     }
