@@ -68,9 +68,7 @@ abstract class MyIntentService extends Service
     public int onStartCommand(Intent intent, int flags, int startId) {
         onStart(intent, startId);
 
-
-
-        return START_STICKY;
+        return START_STICKY_COMPATIBILITY ;
     }
 
     @Override
@@ -122,7 +120,6 @@ public class KATesterService extends MyIntentService
     protected void onHandleIntent(Intent intent)
     {
         String strAction = intent.getAction();
-
         if (strAction == null)
             return;
 
@@ -153,6 +150,9 @@ public class KATesterService extends MyIntentService
 
     void ScheduleNextKA()
     {
+        if (m_tester.IsCompleted())
+            return;
+
         OpenChannel();
 
         int delay = m_tester.GetNextIntervalToTest();
@@ -177,7 +177,7 @@ public class KATesterService extends MyIntentService
         boolean fKASuccess;
         Context context = getApplicationContext();
 
-        if (m_tester.IsCompleted() || !IsChannelOpen())
+        if (m_tester == null || m_tester.IsCompleted() || !IsChannelOpen())
             return;
 
         //
