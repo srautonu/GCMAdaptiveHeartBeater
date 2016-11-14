@@ -33,9 +33,7 @@ public class NotificationHandler extends FirebaseMessagingService {
         String strType = data.get("Category");
         int notificationId = Integer.parseInt(data.get("NotificationId"));
 
-        Log.d(TAG, "From: " + remoteMessage.getFrom());
-        Log.d(TAG, "Notification type: " + strType);
-        Log.d(TAG, "Notification Id: " + notificationId);
+        Log.i(TAG, "Notification Received> Type: " + strType + " Id: " + notificationId);
 
         //
         // Update the count in shared preference API

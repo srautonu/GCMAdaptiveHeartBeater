@@ -31,15 +31,18 @@ public class GCMKAUpdater extends WakefulBroadcastReceiver
 
         System.out.println("Action: " + strAction);
 
-        if (strAction.equalsIgnoreCase(Constants.ACTION_SEND_GCM_KA))
+        if (strAction.equalsIgnoreCase(Constants.ACTION_SEND_GCM_KA)
+                && Utilities.getExpModel(context) >= 2)
         {
             sendGCMKA(context);
         }
-        else if (strAction.equalsIgnoreCase(Constants.ACTION_SEND_TEST_KA))
+        else if (strAction.equalsIgnoreCase(Constants.ACTION_SEND_TEST_KA)
+                && Utilities.getExpModel(context) == 3)
         {
             sendTestKA(context);
         }
-        else if (strAction.equalsIgnoreCase(Constants.ACTION_START_KA_TESTING))
+        else if (strAction.equalsIgnoreCase(Constants.ACTION_START_KA_TESTING)
+                && Utilities.getExpModel(context) == 3)
         {
             scheduleTestKA(context, -1);
         }

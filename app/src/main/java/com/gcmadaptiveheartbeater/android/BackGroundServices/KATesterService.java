@@ -90,15 +90,15 @@ abstract class MyIntentService extends Service
 
 
 // kopottakha.cs.uiuc.edu:8080
-// www.ekngine.com:8080
+// www.ekngine.com:5228
 
 /**
  * Created by mrahman on 24-Oct-16.
  */
 public class KATesterService extends MyIntentService
 {
-    String m_strServerDNS = "kopottakha.cs.uiuc.edu"; //"www.ekngine.com";
-    int m_serverPort = 8080;
+    String m_strServerDNS = "www.ekngine.com";
+    int m_serverPort = 5228;
 
     Socket m_sock;
     DataOutputStream m_outToServer;

@@ -5,14 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
@@ -21,8 +16,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-
-import com.gcmadaptiveheartbeater.android.BackGroundServices.NotificationHandler;
 
 public class KAStats extends Fragment {
     final String[] _rgStrKAInfoLabel = {
@@ -34,7 +27,6 @@ public class KAStats extends Fragment {
         "GCM KA TS",
         "Connected",
         "Type",
-        "APN/SSID",
     };
 
     String[] _rgStrKAInfo = _rgStrKAInfoLabel.clone();
@@ -107,31 +99,6 @@ public class KAStats extends Fragment {
 
         _rgStrKAInfo[i] = _rgStrKAInfoLabel[i] + " (" + activeNetwork.getTypeName() + ")";
         i++;
-
-        if (isConnected) {
-            //
-            // Get the type of network
-            //  0 --> mobile
-            //  1 --> WiFi
-            //
-            int networkType = activeNetwork.getType();
-
-            if (0 == networkType) {
-                Cursor c = getContext().getContentResolver().query(Uri.parse("content://telephony/carriers/preferapn"), null, null, null, null);
-
-                c.moveToFirst();
-
-                _rgStrKAInfo[i] = _rgStrKAInfoLabel[i] + " (" + c.getString(c.getColumnIndex("apn")) + ")";
-                i++;
-            } else if (1 == networkType) {
-                // type 1 means WIFI connection
-                WifiManager wifiManager = (WifiManager) getContext().getSystemService(Context.WIFI_SERVICE);
-                WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-
-                _rgStrKAInfo[i] = _rgStrKAInfoLabel[i] + " (" + wifiInfo.getSSID() + ")";
-                i++;
-            }
-        }
 
         _kaInfoListAdapter.notifyDataSetChanged();
     }
