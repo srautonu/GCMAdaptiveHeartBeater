@@ -117,6 +117,11 @@ public class KATesterService extends MyIntentService
     @Override
     protected void onHandleIntent(Intent intent)
     {
+        // UNKNOWN CAUSE: We are still seeing unknown intent come in if the app
+        // is forcibly closed.
+        if (intent == null)
+            return;
+
         String strAction = intent.getAction();
         if (strAction == null)
             return;
