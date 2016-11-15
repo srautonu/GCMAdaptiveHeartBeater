@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">GCMAdaptiveHeartBeater</string>
+
+    <!--
+    Model drop down list related strings
+    -->
+    <string name="expModelPrompt">Choose a model</string>
+    <string-array name="expModels">
+        <item>Android Model</item>
+        <item>Agressive</item>
+        <item>Adaptive Model</item>
+    </string-array>
+
 </resources>

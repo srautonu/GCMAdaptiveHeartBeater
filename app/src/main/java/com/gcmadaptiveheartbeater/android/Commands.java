@@ -9,12 +9,14 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.gcmadaptiveheartbeater.android.BackGroundServices.KATesterService;
@@ -28,6 +30,8 @@ public class Commands extends Fragment {
     TextView _deviceId;
     Button _expToggleBtn;
     int _expTogglerState;
+    Spinner _expModelSpinner;
+
 
     String[] _strExpToggler = {
         "Start Experiment",
@@ -36,29 +40,30 @@ public class Commands extends Fragment {
 
     private void setupMocks()
     {
-        SharedPreferences.Editor editor = getContext().getSharedPreferences(Constants.SETTINGS_FILE, 0).edit();
+//        SharedPreferences.Editor editor = getContext().getSharedPreferences(Constants.SETTINGS_FILE, 0).edit();
 
 //        editor.putInt(Constants.LKG_KA, 1);
 //        editor.putInt(Constants.LKB_KA, 2);
 //        editor.putBoolean(Constants.EXP_IN_PROGRESS, true);
 
-        editor.putInt(Constants.EXP_MODEL, 3);
-
-        editor.commit();
+//        editor.putInt(Constants.EXP_MODEL, 3);
+//
+//        editor.commit();
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        SharedPreferences pref = getContext().getSharedPreferences(Constants.SETTINGS_FILE, 0);
-
         View view = (LinearLayout) inflater.inflate(R.layout.fragment_commands, container, false);
+
+        _expModelSpinner = (Spinner) view.findViewById(R.id.expModelSpinner);
+        _expModelSpinner.setSelection(2); // Set Adaptive model by default
 
         _expToggleBtn = (Button) view.findViewById(R.id.expToggleBtn);
         _deviceId = (TextView) view.findViewById(R.id.deviceId);
 
         String strAccount = getAccount();
         _deviceId.setText(strAccount.toCharArray(), 0, strAccount.length());
-        if (Utilities.isExperimentRunning(pref))
+        if (Utilities.isExperimentRunning(getContext()))
         {
             _expTogglerState = 1;
         }
@@ -72,12 +77,10 @@ public class Commands extends Fragment {
             new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    SharedPreferences pref = getContext().getSharedPreferences(Constants.SETTINGS_FILE, 0);
-
                     _expTogglerState = (_expTogglerState + 1) % 2;
                     _expToggleBtn.setText(_strExpToggler[_expTogglerState]);
 
-                    if (Utilities.isExperimentRunning(pref))
+                    if (Utilities.isExperimentRunning(getContext()))
                     {
                         //
                         // If experiment is already running, a click performs stop action
@@ -87,28 +90,30 @@ public class Commands extends Fragment {
 
                         stopGCMKA();
 
-                        Utilities.setExperimentRunning(pref, false);
+                        Utilities.setExperimentRunning(getContext(), false);
                     }
                     else // start experiment
                     {
                         //
                         // Clear all cached settings
                         //
-                        pref.edit().clear().commit();
+                        getContext().getSharedPreferences(Constants.SETTINGS_FILE, 0).edit().clear().commit();
 
-                        setupMocks();
+                        // broadcast the trigger to update all the tabs with settings info
+                        LocalBroadcastManager.getInstance(getContext()).sendBroadcast(
+                                new Intent(Constants.ACTION_HANDLE_SETTINGS_UPDATE)
+                            );
+
+                        //setupMocks();
 
                         //
                         // Mark experiment running
                         //
-                        Utilities.setExperimentRunning(pref, true);
+                        Utilities.setExperimentRunning(getContext(), true);
 
-                        //
-                        // Model #1: Android as is. No KA testing, No additional GCM KA
-                        // Model #2: Agressive GCM KA (1 minute). No KA Testing
-                        // Model #3: KA testing. GCM Adaptive KA
-                        //
-                        int expModel = Utilities.getExpModel(getContext());
+                        int expModel = 1 + (int)_expModelSpinner.getSelectedItemId();
+                        Utilities.putExpModel(getContext(), expModel);
+
                         if (expModel >= 2)
                         {
                             startGCMKA();

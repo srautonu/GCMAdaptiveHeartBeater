@@ -45,7 +45,7 @@ public class MainActivity extends FragmentActivity {
         // Make notification info page the primary page, when we are already
         // inside an experiment
         //
-        if (Utilities.isExperimentRunning(getSharedPreferences(Constants.SETTINGS_FILE, 0)))
+        if (Utilities.isExperimentRunning(getApplicationContext()))
             pager.setCurrentItem(1);
     }
 }

@@ -12,8 +12,6 @@ import com.gcmadaptiveheartbeater.android.Utilities;
 
 import java.io.*;
 import java.net.*;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -186,11 +184,6 @@ public class KATesterService extends MyIntentService
         int delay = m_tester.GetNextIntervalToTest();
 
         //
-        // We are about to send a KA. Increment the test KA counter
-        //
-        Utilities.incrementSetting(this, Constants.TEST_KA_COUNT);
-
-        //
         // Now send a ping
         //
         try {
@@ -234,9 +227,10 @@ public class KATesterService extends MyIntentService
             Log("Updated settings with new LKB KA: " + delay);
         }
 
-        Utilities.updateSetting(this, Constants.TEST_KA_TIMESTAMP,
-                new SimpleDateFormat("MM/dd/yyyy h:mm:ss a").format(new Date())
-        );
+        //
+        // We have sent a KA (successfully or not). Increment the test KA counter
+        //
+        Utilities.incrementTestKACount(this);
 
         Log("LKG KA Interval is " + m_tester.GetLKGInterval() + " minutes.\n");
 

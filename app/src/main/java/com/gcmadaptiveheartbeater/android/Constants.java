@@ -63,6 +63,16 @@ public class Constants {
     public final static String GCM_KA_COUNT = "gcmKACount";
 
     //
+    // Experiment start time stamp
+    //
+    public final static String EXP_START_TIMESTAMP = "expStartTimeStamp";
+
+    //
+    // Experiment start time stamp
+    //
+    public final static String EXP_END_TIMESTAMP = "expEndTimeStamp";
+
+    //
     // Time stamp of last KA packet in the test connection
     //
     public final static String TEST_KA_TIMESTAMP = "testKATimeStamp";

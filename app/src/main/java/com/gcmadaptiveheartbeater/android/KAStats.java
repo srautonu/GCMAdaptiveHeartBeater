@@ -25,6 +25,8 @@ public class KAStats extends Fragment {
         "GCM KA Count",
         "Test KA TS",
         "GCM KA TS",
+        "Experiment start TS",
+        "Experiment end TS",
         "Connected",
         "Type",
     };
@@ -67,12 +69,14 @@ public class KAStats extends Fragment {
         // The order here should be corresponding to _rgStrKAInfoLabel
         //
         final String[] strTag = {
-                Constants.LKG_KA,
-                Constants.LKB_KA,
-                Constants.TEST_KA_COUNT,
-                Constants.GCM_KA_COUNT,
-                Constants.TEST_KA_TIMESTAMP,
-                Constants.GCM_KA_TIMESTAMP
+            Constants.LKG_KA,
+            Constants.LKB_KA,
+            Constants.TEST_KA_COUNT,
+            Constants.GCM_KA_COUNT,
+            Constants.TEST_KA_TIMESTAMP,
+            Constants.GCM_KA_TIMESTAMP,
+            Constants.EXP_START_TIMESTAMP,
+            Constants.EXP_END_TIMESTAMP
         };
 
         if (null == getContext())
@@ -80,9 +84,8 @@ public class KAStats extends Fragment {
 
         SharedPreferences settings = getContext().getSharedPreferences(Constants.SETTINGS_FILE, 0);
 
-        //for (int i = 0; i < _rgStrKAInfo.length; i++)
         int i;
-        for (i = 0; i < 6; i++)
+        for (i = 0; i < strTag.length; i++)
         {
             if (i < 4)
                 _rgStrKAInfo[i] = _rgStrKAInfoLabel[i] + " (" + settings.getInt(strTag[i], -1) + ")";
@@ -97,8 +100,11 @@ public class KAStats extends Fragment {
         _rgStrKAInfo[i] = _rgStrKAInfoLabel[i] + " (" + isConnected + ")";
         i++;
 
-        _rgStrKAInfo[i] = _rgStrKAInfoLabel[i] + " (" + activeNetwork.getTypeName() + ")";
-        i++;
+        _rgStrKAInfo[i] = _rgStrKAInfoLabel[i];
+        if (isConnected)
+        {
+            _rgStrKAInfo[i] += " (" + activeNetwork.getTypeName() + ")";
+        }
 
         _kaInfoListAdapter.notifyDataSetChanged();
     }
