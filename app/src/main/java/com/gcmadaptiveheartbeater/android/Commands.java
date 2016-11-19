@@ -1,7 +1,5 @@
 package com.gcmadaptiveheartbeater.android;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -40,15 +38,12 @@ public class Commands extends Fragment {
 
     private void setupMocks()
     {
-//        SharedPreferences.Editor editor = getContext().getSharedPreferences(Constants.SETTINGS_FILE, 0).edit();
+        SharedPreferences.Editor editor = getContext().getSharedPreferences(Constants.SETTINGS_FILE, 0).edit();
 
-//        editor.putInt(Constants.LKG_KA, 1);
-//        editor.putInt(Constants.LKB_KA, 2);
-//        editor.putBoolean(Constants.EXP_IN_PROGRESS, true);
+        editor.putInt(Constants.LKG_KA, 20);
+        editor.putInt(Constants.LKB_KA, 21);
 
-//        editor.putInt(Constants.EXP_MODEL, 3);
-//
-//        editor.commit();
+        editor.commit();
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -59,11 +54,8 @@ public class Commands extends Fragment {
         _expModelSpinner.setSelection(2); // Set Adaptive model by default
 
         _expToggleBtn = (Button) view.findViewById(R.id.expToggleBtn);
-        _deviceId = (TextView) view.findViewById(R.id.deviceId);
 
-        String strAccount = getAccount();
-        _deviceId.setText(strAccount.toCharArray(), 0, strAccount.length());
-        if (Utilities.isExperimentRunning(getContext()))
+        if (SettingsUtil.isExperimentRunning(getContext()))
         {
             _expTogglerState = 1;
         }
@@ -80,7 +72,7 @@ public class Commands extends Fragment {
                     _expTogglerState = (_expTogglerState + 1) % 2;
                     _expToggleBtn.setText(_strExpToggler[_expTogglerState]);
 
-                    if (Utilities.isExperimentRunning(getContext()))
+                    if (SettingsUtil.isExperimentRunning(getContext()))
                     {
                         //
                         // If experiment is already running, a click performs stop action
@@ -90,7 +82,7 @@ public class Commands extends Fragment {
 
                         stopGCMKA();
 
-                        Utilities.setExperimentRunning(getContext(), false);
+                        SettingsUtil.setExperimentRunning(getContext(), false);
                     }
                     else // start experiment
                     {
@@ -109,10 +101,10 @@ public class Commands extends Fragment {
                         //
                         // Mark experiment running
                         //
-                        Utilities.setExperimentRunning(getContext(), true);
+                        SettingsUtil.setExperimentRunning(getContext(), true);
 
                         int expModel = 1 + (int)_expModelSpinner.getSelectedItemId();
-                        Utilities.putExpModel(getContext(), expModel);
+                        SettingsUtil.putExpModel(getContext(), expModel);
 
                         if (expModel >= 2)
                         {
@@ -128,23 +120,6 @@ public class Commands extends Fragment {
         );
 
         return view;
-    }
-
-    private String getAccount()
-    {
-        AccountManager accountManager = AccountManager.get(getContext());
-        Account account = null;
-
-        Account[] accounts = accountManager.getAccountsByType("com.google");
-        if (accounts.length > 0) {
-            account = accounts[0];
-        }
-
-        if (account == null) {
-            return "";
-        } else {
-            return account.name;
-        }
     }
 
     // request a GCM KA immediately

@@ -1,14 +1,10 @@
 package com.gcmadaptiveheartbeater.android.BackGroundServices;
 
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import com.gcmadaptiveheartbeater.android.Utilities;
+import com.gcmadaptiveheartbeater.android.SettingsUtil;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-import com.gcmadaptiveheartbeater.android.Constants;
 
 import java.util.Map;
 
@@ -38,6 +34,6 @@ public class NotificationHandler extends FirebaseMessagingService {
         //
         // Update the count in shared preference API
         //
-        Utilities.incrementSetting(this, strType);
+        SettingsUtil.incrementSetting(this, strType);
     }
 }

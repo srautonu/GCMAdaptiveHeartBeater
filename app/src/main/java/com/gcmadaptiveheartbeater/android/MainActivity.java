@@ -1,18 +1,11 @@
 package com.gcmadaptiveheartbeater.android;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-
-import com.gcmadaptiveheartbeater.android.BackGroundServices.*;
 
 import java.util.List;
 import java.util.Vector;
@@ -45,7 +38,7 @@ public class MainActivity extends FragmentActivity {
         // Make notification info page the primary page, when we are already
         // inside an experiment
         //
-        if (Utilities.isExperimentRunning(getApplicationContext()))
+        if (SettingsUtil.isExperimentRunning(getApplicationContext()))
             pager.setCurrentItem(1);
     }
 }

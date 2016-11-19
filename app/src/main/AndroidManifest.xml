@@ -31,6 +31,13 @@
                 <action android:name="com.gcmadaptiveheartbeater.android.SEND_TEST_KA" />
             </intent-filter>
         </service>
+        <service android:name=".BackGroundServices.KADataService" android:exported="false" >
+            <intent-filter>
+                <action android:name="com.gcmadaptiveheartbeater.android.SEND_GCM_KA" />
+            </intent-filter>
+        </service>
+
+        KADataService
         <receiver android:name=".BackGroundServices.GCMKAUpdater">
             <intent-filter>
                 <action android:name="com.gcmadaptiveheartbeater.android.SEND_GCM_KA" />
@@ -39,10 +46,9 @@
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
-
-
     </application>
-    
+
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_LOGS" />
 </manifest>

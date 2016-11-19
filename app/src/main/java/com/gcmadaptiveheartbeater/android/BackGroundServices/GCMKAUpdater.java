@@ -12,7 +12,8 @@ import android.support.v4.content.WakefulBroadcastReceiver;
 
 import com.gcmadaptiveheartbeater.android.BuildConfig;
 import com.gcmadaptiveheartbeater.android.Constants;
-import com.gcmadaptiveheartbeater.android.Utilities;
+import com.gcmadaptiveheartbeater.android.NetworkUtil;
+import com.gcmadaptiveheartbeater.android.SettingsUtil;
 
 /**
  * Created by mrahman on 24-Oct-16.
@@ -31,7 +32,7 @@ public class GCMKAUpdater extends WakefulBroadcastReceiver
 
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        boolean isConnected = (activeNetwork != null && activeNetwork.isConnectedOrConnecting());
+        boolean isConnected = NetworkUtil.isConnected(context);
 
         //
         // No point sending/scheduling test/GCM KA if we are not connected
@@ -43,17 +44,17 @@ public class GCMKAUpdater extends WakefulBroadcastReceiver
         }
 
         if (strAction.equalsIgnoreCase(Constants.ACTION_SEND_GCM_KA)
-                && Utilities.getExpModel(context) >= 2)
+                && SettingsUtil.getExpModel(context) >= 2)
         {
             sendGCMKA(context);
         }
         else if (strAction.equalsIgnoreCase(Constants.ACTION_SEND_TEST_KA)
-                && Utilities.getExpModel(context) == 3)
+                && SettingsUtil.getExpModel(context) == 3)
         {
             sendTestKA(context);
         }
         else if (strAction.equalsIgnoreCase(Constants.ACTION_START_KA_TESTING)
-                && Utilities.getExpModel(context) == 3)
+                && SettingsUtil.getExpModel(context) == 3)
         {
             scheduleTestKA(context, -1);
         }
@@ -76,7 +77,7 @@ public class GCMKAUpdater extends WakefulBroadcastReceiver
             //
             if (isConnected)
             {
-                int expModel = Utilities.getExpModel(context);
+                int expModel = SettingsUtil.getExpModel(context);
                 if (expModel >= 2) {
                     scheduleGCMKA(context, 1);
                 }
@@ -90,17 +91,16 @@ public class GCMKAUpdater extends WakefulBroadcastReceiver
 
     private void sendGCMKA(Context context)
     {
-        Intent gTalkHeartBeatIntent = new Intent("com.google.android.intent.action.GTALK_HEARTBEAT");
-        Intent mcsHeartBeatIntent = new Intent("com.google.android.intent.action.MCS_HEARTBEAT");
-
         //
         // We are about to send GCM KA. Update the counter.
         //
-        Utilities.incrementGCMKACount(context);
-
+        SettingsUtil.incrementGCMKACount(context);
         System.out.println("Sending GCM KA.");
-        context.sendBroadcast(gTalkHeartBeatIntent);
-        context.sendBroadcast(mcsHeartBeatIntent);
+
+//        context.sendBroadcast(new Intent("com.google.android.intent.action.GTALK_HEARTBEAT"));
+//        context.sendBroadcast(new Intent("com.google.android.intent.action.MCS_HEARTBEAT"));
+
+        startWakefulService(context, new Intent(Constants.ACTION_SEND_GCM_KA).setPackage(BuildConfig.APPLICATION_ID));
 
         //
         // Schedule the next keep-alive.
@@ -108,7 +108,7 @@ public class GCMKAUpdater extends WakefulBroadcastReceiver
         // In model 3, we use last known good KA interval (-1 used in delayM)
         scheduleGCMKA(
             context,
-            Utilities.getExpModel(context) == 2 ? 1 : -1
+            SettingsUtil.getExpModel(context) == 2 ? 1 : -1
             );
     }
 
@@ -164,12 +164,5 @@ public class GCMKAUpdater extends WakefulBroadcastReceiver
                 PendingIntent.getBroadcast(context, 0, new Intent(Constants.ACTION_START_KA_TESTING), PendingIntent.FLAG_UPDATE_CURRENT)
                 );
         }
-    }
-
-    private boolean isConnected(Context context) {
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-
-        return activeNetwork.isConnectedOrConnecting();
     }
 }

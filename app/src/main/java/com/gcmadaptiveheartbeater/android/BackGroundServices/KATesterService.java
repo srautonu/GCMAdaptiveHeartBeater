@@ -2,88 +2,16 @@ package com.gcmadaptiveheartbeater.android.BackGroundServices;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.gcmadaptiveheartbeater.android.Constants;
-import com.gcmadaptiveheartbeater.android.Utilities;
+import com.gcmadaptiveheartbeater.android.SettingsUtil;
 
 import java.io.*;
 import java.net.*;
-
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.IBinder;
-import android.os.Looper;
-import android.os.Message;
-
-abstract class MyIntentService extends Service
-{
-    private volatile Looper mServiceLooper;
-    private volatile ServiceHandler mServiceHandler;
-    private String mName;
-
-    private final class ServiceHandler extends Handler
-    {
-        public ServiceHandler(Looper looper)
-        {
-            super(looper);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            onHandleIntent((Intent)msg.obj);
-        }
-    }
-
-    public MyIntentService(String name) {
-        super();
-        mName = name;
-    }
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-
-        HandlerThread thread = new HandlerThread("MyIntentService[" + mName + "]");
-        thread.start();
-
-        mServiceLooper = thread.getLooper();
-        mServiceHandler = new ServiceHandler(mServiceLooper);
-    }
-
-    @Override
-    public void onStart(Intent intent, int startId) {
-        Message msg = mServiceHandler.obtainMessage();
-        msg.arg1 = startId;
-        msg.obj = intent;
-        mServiceHandler.sendMessage(msg);
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        onStart(intent, startId);
-
-        return START_STICKY_COMPATIBILITY ;
-    }
-
-    @Override
-    public void onDestroy()
-    {
-        mServiceLooper.quit();
-    }
-
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
-
-    protected abstract void onHandleIntent(Intent intent);
-}
-
 
 // kopottakha.cs.uiuc.edu:8080
 // www.ekngine.com:5228
@@ -91,7 +19,7 @@ abstract class MyIntentService extends Service
 /**
  * Created by mrahman on 24-Oct-16.
  */
-public class KATesterService extends MyIntentService
+public class KATesterService extends StickyIntentService
 {
     String m_strServerDNS = "www.ekngine.com";
     int m_serverPort = 5228;
@@ -225,17 +153,17 @@ public class KATesterService extends MyIntentService
         // be updated in the settings. Otherwise, update LKB KA
         //
         if (fKASuccess) {
-            Utilities.updateSetting(this, Constants.LKG_KA, delay);
+            SettingsUtil.updateSetting(this, Constants.LKG_KA, delay);
             Log("Updated settings with new LKG KA: " + delay);
         } else {
-            Utilities.updateSetting(this, Constants.LKB_KA, delay);
+            SettingsUtil.updateSetting(this, Constants.LKB_KA, delay);
             Log("Updated settings with new LKB KA: " + delay);
         }
 
         //
         // We have sent a KA (successfully or not). Increment the test KA counter
         //
-        Utilities.incrementTestKACount(this);
+        SettingsUtil.incrementTestKACount(this);
 
         Log("LKG KA Interval is " + m_tester.GetLKGInterval() + " minutes.\n");
 
@@ -327,7 +255,7 @@ public class KATesterService extends MyIntentService
 
     private void Log(String strToLog)
     {
-        System.out.println("TestConn - " + strToLog);
+        Log.i("TestConn", strToLog);
     }
 }
 

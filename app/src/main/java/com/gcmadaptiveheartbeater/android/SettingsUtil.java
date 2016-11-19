@@ -12,7 +12,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class Utilities {
+public class SettingsUtil {
     public static boolean isExperimentRunning(Context context)
     {
         return context.getSharedPreferences(Constants.SETTINGS_FILE, 0).getBoolean(Constants.EXP_IN_PROGRESS, false);
