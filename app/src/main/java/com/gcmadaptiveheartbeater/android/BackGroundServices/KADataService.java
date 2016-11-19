@@ -21,7 +21,7 @@ import java.net.Socket;
  */
 
 public class KADataService extends StickyIntentService {
-    String _strServerDNS = "172.20.30.218"; //"192.168.0.104"; //"www.ekngine.com";
+    String _strServerDNS = "www.ekngine.com";
     int _serverPort = 5229;
 
     KADataReadHandler _readHandler;
