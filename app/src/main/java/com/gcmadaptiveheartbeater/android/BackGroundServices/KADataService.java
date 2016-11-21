@@ -8,7 +8,7 @@ import android.util.Log;
 
 import com.gcmadaptiveheartbeater.android.Constants;
 import com.gcmadaptiveheartbeater.android.NetworkUtil;
-import com.google.firebase.iid.FirebaseInstanceId;
+import com.gcmadaptiveheartbeater.android.SettingsUtil;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -21,7 +21,7 @@ import java.net.Socket;
  */
 
 public class KADataService extends StickyIntentService {
-    String _strServerDNS = "www.ekngine.com";
+    String _strServerDNS = "www.ekngine.com"; //"192.168.0.104"; //"www.ekngine.com";
     int _serverPort = 5229;
 
     KADataReadHandler _readHandler;
@@ -71,7 +71,7 @@ public class KADataService extends StickyIntentService {
                 //
                 try {
                     _outToServer.writeBytes("PING\n");
-                    Log("sent> PING TEST\n");
+                    Log("sent> PING\n");
                 } catch (IOException e) {
                     System.out.println(e);
                     CloseChannel();
@@ -112,7 +112,7 @@ public class KADataService extends StickyIntentService {
                 _readHandler = new KADataReadHandler(this, new BufferedReader(new InputStreamReader(_sock.getInputStream())));
                 Log("Done.\n");
 
-                String strClntCmd = "CLNT " + FirebaseInstanceId.getInstance().getToken();
+                String strClntCmd = "CLNT " + SettingsUtil.getDeviceId(this);
                 _outToServer.writeBytes(strClntCmd + "\n");
                 Log("sent> " + strClntCmd);
             }

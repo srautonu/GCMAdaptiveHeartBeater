@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v4.content.LocalBroadcastManager;
 
+import com.google.firebase.iid.FirebaseInstanceId;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -34,6 +36,19 @@ public class SettingsUtil {
     {
         SharedPreferences pref = context.getSharedPreferences(Constants.SETTINGS_FILE, 0);
         pref.edit().putInt(Constants.EXP_MODEL, model).commit();
+        notifySettingsChanged(context);
+    }
+
+    public static String getDeviceId(Context context)
+    {
+        //FirebaseInstanceId.getInstance().getToken();
+        return context.getSharedPreferences(Constants.SETTINGS_FILE, 0).getString(Constants.DEVICE_NAME, "");
+    }
+
+    public static void putDeviceId(Context context, String strDeviceId)
+    {
+        SharedPreferences pref = context.getSharedPreferences(Constants.SETTINGS_FILE, 0);
+        pref.edit().putString(Constants.DEVICE_NAME, strDeviceId).commit();
         notifySettingsChanged(context);
     }
 

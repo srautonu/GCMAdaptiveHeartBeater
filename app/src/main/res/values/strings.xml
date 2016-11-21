@@ -6,9 +6,17 @@
     -->
     <string name="expModelPrompt">Choose a model</string>
     <string-array name="expModels">
-        <item>Android Model</item>
+        <item>Fixed rate</item>
         <item>Agressive</item>
         <item>Adaptive Model</item>
+    </string-array>
+    <string-array name="deviceIds">
+        <item>SAIFUR</item>
+        <item>SARWAR</item>
+        <item>TAHMID</item>
+        <item>SOHEL</item>
+        <item>HEQEP</item>
+        <item>CUBOT</item>
     </string-array>
 
 </resources>

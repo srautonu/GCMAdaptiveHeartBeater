@@ -29,7 +29,7 @@ public class Commands extends Fragment {
     Button _expToggleBtn;
     int _expTogglerState;
     Spinner _expModelSpinner;
-
+    Spinner _deviceIdSpinner;
 
     String[] _strExpToggler = {
         "Start Experiment",
@@ -52,6 +52,8 @@ public class Commands extends Fragment {
 
         _expModelSpinner = (Spinner) view.findViewById(R.id.expModelSpinner);
         _expModelSpinner.setSelection(2); // Set Adaptive model by default
+
+        _deviceIdSpinner = (Spinner) view.findViewById(R.id.deviceIdSpinner);
 
         _expToggleBtn = (Button) view.findViewById(R.id.expToggleBtn);
 
@@ -105,6 +107,9 @@ public class Commands extends Fragment {
 
                         int expModel = 1 + (int)_expModelSpinner.getSelectedItemId();
                         SettingsUtil.putExpModel(getContext(), expModel);
+
+                        String strDeviceId = (String)_deviceIdSpinner.getSelectedItem();
+                        SettingsUtil.putDeviceId(getContext(), strDeviceId);
 
                         if (expModel >= 2)
                         {

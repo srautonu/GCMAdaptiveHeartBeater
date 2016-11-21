@@ -6,6 +6,14 @@
     <Spinner
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/deviceIdSpinner"
+        android:entries="@array/deviceIds"
+        android:gravity="center"
+        />
+
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:id="@+id/expModelSpinner"
         android:entries="@array/expModels"
         android:gravity="center"
