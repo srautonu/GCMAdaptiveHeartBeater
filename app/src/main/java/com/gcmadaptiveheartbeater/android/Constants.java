@@ -9,7 +9,7 @@ public class Constants {
     //
     // Intent/action names
     //
-    public final static String ACTION_SEND_GCM_KA            = "com.gcmadaptiveheartbeater.android.SEND_GCM_KA";
+    public final static String ACTION_SEND_DATA_KA = "com.gcmadaptiveheartbeater.android.SEND_GCM_KA";
     public final static String ACTION_SEND_TEST_KA           = "com.gcmadaptiveheartbeater.android.SEND_TEST_KA";
     public final static String ACTION_START_KA_TESTING       = "com.gcmadaptiveheartbeater.android.START_KA_TESTING";
 
@@ -48,9 +48,9 @@ public class Constants {
     public final static String LKB_KA = "lkbKA";
 
     //
-    // Convergence time (minutes) for KA algorithm.
+    // keep-alive interval (in minutes) used in the data connection
     //
-    public final static String CT_KA = "ctKA";
+    public final static String DATA_KA = "dataKA";
 
     //
     // Number of KA packets sent over the test connection.
@@ -86,4 +86,10 @@ public class Constants {
     // Whether an experiment is in progress
     //
     public final static String EXP_IN_PROGRESS = "expInProgress";
+
+    //
+    // Experiment model Ids
+    //
+    public final static int EXP_MODEL_ADAPTIVE = 1;
+    public final static int EXP_MODEL_FIXED_RATE = 2;
 }

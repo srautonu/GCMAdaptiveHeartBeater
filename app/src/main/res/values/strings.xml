@@ -1,14 +1,15 @@
 <resources>
     <string name="app_name">GCMAdaptiveHeartBeater</string>
 
-    <!--
-    Model drop down list related strings
-    -->
-    <string name="expModelPrompt">Choose a model</string>
     <string-array name="expModels">
+        <item>Adaptive (Composite)</item>
         <item>Fixed rate</item>
-        <item>Agressive</item>
-        <item>Adaptive Model</item>
+    </string-array>
+    <string-array name="heartBeatRates">
+        <item>4</item>
+        <item>16</item>
+        <item>24</item>
+        <item>32</item>
     </string-array>
     <string-array name="deviceIds">
         <item>SAIFUR</item>

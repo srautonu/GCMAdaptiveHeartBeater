@@ -9,6 +9,7 @@ import android.net.NetworkInfo;
  */
 
 public class NetworkUtil {
+    static int connType = -1;
     public static boolean isConnected(Context context) {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();

@@ -14,20 +14,22 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketAddress;
 
 /**
  * Created by mrahman on 15-Nov-16.
  */
 
 public class KADataService extends StickyIntentService {
-    String _strServerDNS = "www.ekngine.com"; //"192.168.0.104"; //"www.ekngine.com";
+    String _strServerDNS = "192.168.0.104"; //"www.ekngine.com";
     int _serverPort = 5229;
 
-    KADataReadHandler _readHandler;
-    Socket _sock;
-    DataOutputStream _outToServer;
-    BufferedReader _inFromServer;
+    KADataReadHandler _readHandler = null;
+    Socket _sock = null;
+    DataOutputStream _outToServer = null;
+    BufferedReader _inFromServer = null;
 
     public KADataService()
     {
@@ -53,41 +55,41 @@ public class KADataService extends StickyIntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        if (intent == null)
-            return;
 
-        String strAction = intent.getAction();
-        if (strAction == null)
-            return;
-
-        Log("Action: " + strAction);
-
-        if (strAction.equalsIgnoreCase(Constants.ACTION_SEND_GCM_KA))
-        {
-            if (IsChannelOpen())
-            {
-                //
-                // Now send a ping
-                //
-                try {
-                    _outToServer.writeBytes("PING\n");
-                    Log("sent> PING\n");
-                } catch (IOException e) {
-                    System.out.println(e);
-                    CloseChannel();
-                    ScheduleOpenChannel();
-                }
-            }
-            else if (!OpenChannel())
-            {
-                ScheduleOpenChannel();
+        if (intent == null) {
+            Log("null intent. Still proceeding.");
+        }
+        else {
+            String strAction = intent.getAction();
+            if (null == strAction || !strAction.equalsIgnoreCase(Constants.ACTION_SEND_DATA_KA)) {
+                Log("Ignoring action: " + ((strAction == null) ? "null" : strAction));
+                return;
             }
         }
 
+        if (IsChannelOpen())
+        {
+            //
+            // Now send a ping
+            //
+            try {
+                _outToServer.writeBytes("PING\n");
+                Log("sent> PING");
+            } catch (IOException e) {
+                System.out.println(e);
+                CloseChannel();
+                ScheduleOpenChannel();
+            }
+        }
+        else if (!OpenChannel())
+        {
+            ScheduleOpenChannel();
+        }
+
         //
-        // We ensure that all intents come from GCMKAUpdater, using startWakefulService
+        // We ensure that all intents come from SystemEventsReceiver, using startWakefulService
         //
-        GCMKAUpdater.completeWakefulIntent(intent);
+        SystemEventsReceiver.completeWakefulIntent(intent);
     }
 
     private boolean IsChannelOpen()
@@ -107,7 +109,11 @@ public class KADataService extends StickyIntentService {
             Log("Connecting to " + _strServerDNS + ":" + _serverPort + "...\n");
 
             try {
-                _sock = new Socket(_strServerDNS, _serverPort);
+                SocketAddress sockAddr = new InetSocketAddress(_strServerDNS, _serverPort);
+
+                _sock = new Socket();
+                _sock.connect(sockAddr, 10 * 1000); // connect within 10 seconds, else exception out
+
                 _outToServer = new DataOutputStream(_sock.getOutputStream());
                 _readHandler = new KADataReadHandler(this, new BufferedReader(new InputStreamReader(_sock.getInputStream())));
                 Log("Done.\n");
@@ -135,17 +141,17 @@ public class KADataService extends StickyIntentService {
             try
             {
                 _sock.close();
-                _sock = null;
-                _inFromServer = null;
-                _outToServer = null;
-
-                _readHandler = null;
-
                 Log("Done.\n");
             }
             catch(IOException e)
             {
                 Log(e);
+            }
+            finally {
+                _sock = null;
+                _inFromServer = null;
+                _outToServer = null;
+                _readHandler = null;
             }
         }
     }
@@ -160,7 +166,7 @@ public class KADataService extends StickyIntentService {
         alarm.set(
             AlarmManager.RTC_WAKEUP,
             System.currentTimeMillis() + 1 * 60 * 1000,
-            PendingIntent.getBroadcast(this, 0, new Intent(Constants.ACTION_SEND_GCM_KA), PendingIntent.FLAG_UPDATE_CURRENT)
+            PendingIntent.getBroadcast(this, 0, new Intent(Constants.ACTION_SEND_DATA_KA), PendingIntent.FLAG_UPDATE_CURRENT)
             );
     }
 

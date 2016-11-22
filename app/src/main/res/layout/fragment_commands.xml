@@ -1,22 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    >
 
-    <Spinner
-        android:layout_width="match_parent"
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/deviceIdSpinner"
-        android:entries="@array/deviceIds"
-        android:gravity="center"
+        android:id="@+id/deviceIdLabel"
+        android:text="Device id:"
+        android:textAllCaps="true"
+        android:layout_alignBottom="@+id/deviceIdSpinner"
         />
 
     <Spinner
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/deviceIdSpinner"
+        android:entries="@array/deviceIds"
+        android:layout_alignParentRight="true"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/expModelLabel"
+        android:text="Heartbeat model:"
+        android:textAllCaps="true"
+        android:layout_alignBottom="@+id/expModelSpinner"
+        />
+
+    <Spinner
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/expModelSpinner"
         android:entries="@array/expModels"
-        android:gravity="center"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/deviceIdSpinner"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/heartBeatRateLabel"
+        android:text="Heartbeat rate"
+        android:textAllCaps="true"
+        android:layout_alignBottom="@+id/heartBeatRateSpinner"
+        />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/heartBeatRateSpinner"
+        android:entries="@array/heartBeatRates"
+        android:textAlignment="center"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/expModelSpinner"
+
         />
 
     <Button
@@ -24,6 +66,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/expToggleBtn"
+        android:layout_below="@+id/heartBeatRateSpinner"
         />
-</LinearLayout>
-
+</RelativeLayout>

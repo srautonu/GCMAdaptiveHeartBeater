@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.gcmadaptiveheartbeater.android.Constants;
+import com.gcmadaptiveheartbeater.android.NetworkUtil;
 import com.gcmadaptiveheartbeater.android.SettingsUtil;
 
 import java.io.*;
@@ -45,12 +46,19 @@ public class KATesterService extends StickyIntentService
     @Override
     protected void onHandleIntent(Intent intent)
     {
-        // UNKNOWN CAUSE: We are still seeing unknown intent come in if the app
-        // is forcibly closed.
-        if (intent == null)
-            return;
+        String strAction = null;
 
-        String strAction = intent.getAction();
+        // UNKNOWN CAUSE: We are still seeing unknown intent come in if the app
+        // is forcibly closed. We still need to start KA testing in this case.
+        // So, manually set the intent action here:
+        if (intent == null) {
+            Log("Converting null intent to START_KA_TESTING action.");
+            strAction = Constants.ACTION_START_KA_TESTING;
+        }
+        else {
+            strAction = intent.getAction();
+        }
+
         if (strAction == null)
             return;
 
@@ -74,38 +82,47 @@ public class KATesterService extends StickyIntentService
         }
 
         //
-        // We ensure that all intents come from GCMKAUpdater, using startWakefulService
+        // We ensure that all intents come from SystemEventsReceiver, using startWakefulService
         //
-        GCMKAUpdater.completeWakefulIntent(intent);
+        SystemEventsReceiver.completeWakefulIntent(intent);
     }
 
     void ScheduleNextKA()
     {
-        if (m_tester.IsCompleted())
-            return;
-
-        OpenChannel();
-
-        int delay = m_tester.GetNextIntervalToTest();
-        Log("Next KA interval to test: " + delay + " minutes.\n");
-
         SharedPreferences pref = getApplicationContext().getSharedPreferences(Constants.SETTINGS_FILE, 0);
         AlarmManager alarm = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+        int delay = 0;
+        Intent intent = null;
+
+        if (m_tester.IsCompleted() || !NetworkUtil.isConnected(this))
+            return;
+
+        if (OpenChannel()) {
+            delay = m_tester.GetNextIntervalToTest();
+            Log("Next KA interval to test: " + delay + " minutes.\n");
+
+            intent = new Intent(Constants.ACTION_SEND_TEST_KA);
+        }
+        else {
+            delay = 1; // re-attempt establishing test connection in one minute
+            intent = new Intent(Constants.ACTION_START_KA_TESTING);
+        }
 
         //
         // Now we need to update the timer.
         //
         alarm.set(
-                AlarmManager.RTC_WAKEUP,
-                System.currentTimeMillis() + delay * 60 * 1000,
-                PendingIntent.getBroadcast(getApplicationContext(), 0, new Intent(Constants.ACTION_SEND_TEST_KA), PendingIntent.FLAG_UPDATE_CURRENT)
-        );
+            AlarmManager.RTC_WAKEUP,
+            System.currentTimeMillis() + delay * 60 * 1000,
+            PendingIntent.getBroadcast(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            );
     }
 
     void SendAndScheduleNextKA()
     {
         String strResponse;
         boolean fKASuccess;
+        boolean fShouldRetry = false;
         Context context = getApplicationContext();
 
         if (m_tester == null || m_tester.IsCompleted() || !IsChannelOpen())
@@ -131,33 +148,42 @@ public class KATesterService extends StickyIntentService
                 // end of input stream reached. That means, the other
                 // side has probably closed the connection
                 //
-                Log("Connection reset by peer.\n");
+                Log("Connection reset by peer.");
                 CloseChannel();
             }
 
         } catch (IOException e) {
-            System.out.println(e);
+            Log(e);
             CloseChannel();
         }
 
         fKASuccess = IsChannelOpen();
+        fShouldRetry = (!fKASuccess && !NetworkUtil.isConnected(this));
 
-        //
-        // Update the KA test algorithm state based on success/failure of
-        // current test
-        //
-        m_tester.SetCurTestResult(fKASuccess);
+        if (fShouldRetry) {
+            Log("Retry clause triggered. Ignoring current test results.");
+        }
+        else {
+            //
+            // Update the KA test algorithm state based on success/failure of
+            // current test
+            //
+            m_tester.SetCurTestResult(fKASuccess);
 
-        //
-        // If the current delay was successful, the LKG KA interval should
-        // be updated in the settings. Otherwise, update LKB KA
-        //
-        if (fKASuccess) {
-            SettingsUtil.updateSetting(this, Constants.LKG_KA, delay);
-            Log("Updated settings with new LKG KA: " + delay);
-        } else {
-            SettingsUtil.updateSetting(this, Constants.LKB_KA, delay);
-            Log("Updated settings with new LKB KA: " + delay);
+            //
+            // If the current delay was successful, the LKG KA interval should
+            // be updated in the settings. Otherwise, update LKB KA
+            //
+            if (fKASuccess) {
+                SettingsUtil.updateSetting(this, Constants.LKG_KA, delay);
+                if (SettingsUtil.getExpModel(this) == Constants.EXP_MODEL_ADAPTIVE) {
+                    SettingsUtil.updateSetting(this, Constants.DATA_KA, delay);
+                }
+                Log("Updated settings with new LKG KA: " + delay);
+            } else {
+                SettingsUtil.updateSetting(this, Constants.LKB_KA, delay);
+                Log("Updated settings with new LKB KA: " + delay);
+            }
         }
 
         //
@@ -205,22 +231,25 @@ public class KATesterService extends StickyIntentService
 
         if (null == m_sock)
         {
-            Log("Connecting to " + m_strServerDNS + ":" + m_serverPort + "...\n");
+            Log("Connecting to " + m_strServerDNS + ":" + m_serverPort + "...");
 
             try {
-                m_sock = new Socket(m_strServerDNS, m_serverPort);
-                //
+                SocketAddress sockAddr = new InetSocketAddress(m_strServerDNS, m_serverPort);
+
+                m_sock = new Socket();
+                m_sock.connect(sockAddr, 10 * 1000); // connect within 10 seconds, else exception out
+
                 // Set the socket read timeout to 30 seconds.
-                //
                 m_sock.setSoTimeout(30 * 1000);
                 m_outToServer = new DataOutputStream(m_sock.getOutputStream());
                 m_inFromServer = new BufferedReader(new InputStreamReader(m_sock.getInputStream()));
 
-                Log("Done.\n");
+                Log("Done.");
             }
             catch (IOException e)
             {
-                System.out.println(e);
+                Log(e);
+                CloseChannel();
                 fRet = false;
             }
         }
@@ -232,30 +261,27 @@ public class KATesterService extends StickyIntentService
     {
         if (null != m_sock)
         {
-            Log("Closing socket ...\n");
+            Log("Closing socket ...");
             try
             {
-                m_inFromServer.close();
-                m_inFromServer = null;
-
-                m_outToServer.close();
-                m_outToServer = null;
-
                 m_sock.close();
-                m_sock = null;
-
-                Log("Done.\n");
+                Log("Done.");
             }
             catch(IOException e)
             {
-                System.out.println(e);
+                Log(e);
+            }
+            finally {
+                m_sock = null;
+                m_inFromServer = null;
+                m_outToServer = null;
             }
         }
     }
 
-    private void Log(String strToLog)
+    private void Log(Object objToLog)
     {
-        Log.i("TestConn", strToLog);
+        Log.i("TestConn", objToLog.toString());
     }
 }
 

@@ -19,7 +19,7 @@ import com.gcmadaptiveheartbeater.android.SettingsUtil;
  * Created by mrahman on 24-Oct-16.
  */
 
-public class GCMKAUpdater extends WakefulBroadcastReceiver
+public class SystemEventsReceiver extends WakefulBroadcastReceiver
 {
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -30,8 +30,6 @@ public class GCMKAUpdater extends WakefulBroadcastReceiver
 
         System.out.println("Action: " + strAction);
 
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         boolean isConnected = NetworkUtil.isConnected(context);
 
         //
@@ -43,18 +41,17 @@ public class GCMKAUpdater extends WakefulBroadcastReceiver
             return;
         }
 
-        if (strAction.equalsIgnoreCase(Constants.ACTION_SEND_GCM_KA)
-                && SettingsUtil.getExpModel(context) >= 2)
+        if (strAction.equalsIgnoreCase(Constants.ACTION_SEND_DATA_KA))
         {
-            sendGCMKA(context);
+            sendDataKA(context);
         }
         else if (strAction.equalsIgnoreCase(Constants.ACTION_SEND_TEST_KA)
-                && SettingsUtil.getExpModel(context) == 3)
+                && SettingsUtil.getExpModel(context) == Constants.EXP_MODEL_ADAPTIVE)
         {
             sendTestKA(context);
         }
         else if (strAction.equalsIgnoreCase(Constants.ACTION_START_KA_TESTING)
-                && SettingsUtil.getExpModel(context) == 3)
+                && SettingsUtil.getExpModel(context) == Constants.EXP_MODEL_ADAPTIVE)
         {
             scheduleTestKA(context, -1);
         }
@@ -78,50 +75,42 @@ public class GCMKAUpdater extends WakefulBroadcastReceiver
             if (isConnected)
             {
                 int expModel = SettingsUtil.getExpModel(context);
-                if (expModel >= 2) {
-                    scheduleGCMKA(context, 1);
-                }
 
-                if (expModel == 3) {
+                scheduleDataKA(context, 1);
+                if (expModel == Constants.EXP_MODEL_ADAPTIVE) {
                     scheduleTestKA(context, 1);
                 }
             }
         }
     }
 
-    private void sendGCMKA(Context context)
+    private void sendDataKA(Context context)
     {
         //
         // We are about to send GCM KA. Update the counter.
         //
         SettingsUtil.incrementGCMKACount(context);
-        System.out.println("Sending GCM KA.");
+        System.out.println("Sending Data KA.");
 
 //        context.sendBroadcast(new Intent("com.google.android.intent.action.GTALK_HEARTBEAT"));
 //        context.sendBroadcast(new Intent("com.google.android.intent.action.MCS_HEARTBEAT"));
 
-        startWakefulService(context, new Intent(Constants.ACTION_SEND_GCM_KA).setPackage(BuildConfig.APPLICATION_ID));
+        startWakefulService(context, new Intent(Constants.ACTION_SEND_DATA_KA).setPackage(BuildConfig.APPLICATION_ID));
 
-        //
         // Schedule the next keep-alive.
-        // In model 2, the interval is always 1 minute. (1 used in delayM
-        // In model 3, we use last known good KA interval (-1 used in delayM)
-        scheduleGCMKA(
-            context,
-            SettingsUtil.getExpModel(context) == 2 ? 1 : -1
-            );
+        scheduleDataKA(context, -1);
     }
 
-    private void scheduleGCMKA(Context context, int delayM)
+    private void scheduleDataKA(Context context, int delayM)
     {
         //
-        // Schedule GCM KA after delay minutes. If delayM is set to negative, then
+        // Schedule Data KA after delay minutes. If delayM is set to negative, then
         // schedule the KA after last known good KA interval
         //
         if (delayM < 0)
         {
             SharedPreferences pref = context.getSharedPreferences(Constants.SETTINGS_FILE, 0);
-            delayM = pref.getInt(Constants.LKG_KA, 1);
+            delayM = pref.getInt(Constants.DATA_KA, 1);
         }
 
         AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
@@ -132,7 +121,7 @@ public class GCMKAUpdater extends WakefulBroadcastReceiver
         alarm.set(
                 AlarmManager.RTC_WAKEUP,
                 System.currentTimeMillis() + delayM * 60 * 1000,
-                PendingIntent.getBroadcast(context, 0, new Intent(Constants.ACTION_SEND_GCM_KA), PendingIntent.FLAG_UPDATE_CURRENT)
+                PendingIntent.getBroadcast(context, 0, new Intent(Constants.ACTION_SEND_DATA_KA), PendingIntent.FLAG_UPDATE_CURRENT)
         );
     }
 
