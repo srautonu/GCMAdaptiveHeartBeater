@@ -5,8 +5,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.content.WakefulBroadcastReceiver;
 
@@ -84,21 +82,28 @@ public class SystemEventsReceiver extends WakefulBroadcastReceiver
         }
     }
 
-    private void sendDataKA(Context context)
+    //
+    // Currently unused. If we want to use GCM instead, we should
+    // call this function for sending Data KA
+    //
+    private void sendGCMKA(Context context)
     {
         //
         // We are about to send GCM KA. Update the counter.
         //
-        SettingsUtil.incrementGCMKACount(context);
+        SettingsUtil.incrementDataKACount(context);
         System.out.println("Sending Data KA.");
 
-//        context.sendBroadcast(new Intent("com.google.android.intent.action.GTALK_HEARTBEAT"));
-//        context.sendBroadcast(new Intent("com.google.android.intent.action.MCS_HEARTBEAT"));
-
-        startWakefulService(context, new Intent(Constants.ACTION_SEND_DATA_KA).setPackage(BuildConfig.APPLICATION_ID));
+        context.sendBroadcast(new Intent("com.google.android.intent.action.GTALK_HEARTBEAT"));
+        context.sendBroadcast(new Intent("com.google.android.intent.action.MCS_HEARTBEAT"));
 
         // Schedule the next keep-alive.
         scheduleDataKA(context, -1);
+    }
+
+    private void sendDataKA(Context context)
+    {
+        startWakefulService(context, new Intent(Constants.ACTION_SEND_DATA_KA).setPackage(BuildConfig.APPLICATION_ID));
     }
 
     private void scheduleDataKA(Context context, int delayM)

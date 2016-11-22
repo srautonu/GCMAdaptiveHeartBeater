@@ -52,7 +52,7 @@ public class SettingsUtil {
         notifySettingsChanged(context);
     }
 
-    public static void incrementGCMKACount(Context context)
+    public static void incrementDataKACount(Context context)
     {
         if (!isExperimentRunning(context))
             return;

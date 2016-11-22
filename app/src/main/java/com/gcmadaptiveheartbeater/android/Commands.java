@@ -42,9 +42,7 @@ public class Commands extends Fragment {
     {
         SharedPreferences.Editor editor = getContext().getSharedPreferences(Constants.SETTINGS_FILE, 0).edit();
 
-        editor.putInt(Constants.LKG_KA, 20);
-        editor.putInt(Constants.LKB_KA, 21);
-
+        editor.putInt(Constants.DATA_KA, 6);
         editor.commit();
     }
 
@@ -101,8 +99,6 @@ public class Commands extends Fragment {
                                 new Intent(Constants.ACTION_HANDLE_SETTINGS_UPDATE)
                             );
 
-                        //setupMocks();
-
                         //
                         // Mark experiment running
                         //
@@ -120,6 +116,9 @@ public class Commands extends Fragment {
                                 Integer.parseInt(_heartBeatRateSpinner.getSelectedItem().toString())
                                 );
                         }
+
+                        //setupMocks();
+
 
                         startDataKA();
                         if (expModel == Constants.EXP_MODEL_ADAPTIVE)

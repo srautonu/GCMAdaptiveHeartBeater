@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.gcmadaptiveheartbeater.android.Constants;
@@ -17,19 +18,22 @@ import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by mrahman on 15-Nov-16.
  */
 
 public class KADataService extends StickyIntentService {
-    String _strServerDNS = "192.168.0.104"; //"www.ekngine.com";
+    String _strServerDNS = "www.ekngine.com";; //"192.168.0.102"; //"www.ekngine.com";
     int _serverPort = 5229;
 
     KADataReadHandler _readHandler = null;
     Socket _sock = null;
     DataOutputStream _outToServer = null;
     BufferedReader _inFromServer = null;
+    ArrayBlockingQueue<String> _queuePingResponse = null;
 
     public KADataService()
     {
@@ -67,6 +71,8 @@ public class KADataService extends StickyIntentService {
             }
         }
 
+        SettingsUtil.incrementDataKACount(this);
+
         if (IsChannelOpen())
         {
             //
@@ -75,15 +81,28 @@ public class KADataService extends StickyIntentService {
             try {
                 _outToServer.writeBytes("PING\n");
                 Log("sent> PING");
-            } catch (IOException e) {
+
+                String strPingResponse = _queuePingResponse.poll(30, TimeUnit.SECONDS);
+                if (null != strPingResponse && strPingResponse.equalsIgnoreCase("PING OK")) {
+                    // Successful KA transaction. So schedule the next KA
+                    ScheduleDataKA(-1);
+                }
+                else {
+                    throw new IOException("PING response time out");
+                }
+            } catch (IOException | InterruptedException e) {
                 System.out.println(e);
                 CloseChannel();
-                ScheduleOpenChannel();
+                ScheduleDataKA(0);
             }
         }
-        else if (!OpenChannel())
+        else if (OpenChannel()) {
+            ScheduleDataKA(-1);
+        }
+
+        else if (NetworkUtil.isConnected(this))
         {
-            ScheduleOpenChannel();
+            ScheduleDataKA(1);
         }
 
         //
@@ -94,7 +113,7 @@ public class KADataService extends StickyIntentService {
 
     private boolean IsChannelOpen()
     {
-        return (null != _sock);
+        return (null != _sock && !_sock.isClosed());
     }
 
     private boolean OpenChannel()
@@ -114,8 +133,10 @@ public class KADataService extends StickyIntentService {
                 _sock = new Socket();
                 _sock.connect(sockAddr, 10 * 1000); // connect within 10 seconds, else exception out
 
+                _queuePingResponse = new ArrayBlockingQueue<String>(10);
                 _outToServer = new DataOutputStream(_sock.getOutputStream());
-                _readHandler = new KADataReadHandler(this, new BufferedReader(new InputStreamReader(_sock.getInputStream())));
+                _readHandler = new KADataReadHandler(this, _queuePingResponse, new BufferedReader(new InputStreamReader(_sock.getInputStream())));
+
                 Log("Done.\n");
 
                 String strClntCmd = "CLNT " + SettingsUtil.getDeviceId(this);
@@ -152,20 +173,26 @@ public class KADataService extends StickyIntentService {
                 _inFromServer = null;
                 _outToServer = null;
                 _readHandler = null;
+                _queuePingResponse = null;
             }
         }
     }
 
-    private void ScheduleOpenChannel()
+    private void ScheduleDataKA(int delayM)
     {
         AlarmManager alarm = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+        if (delayM < 0) {
+            SharedPreferences settings = getSharedPreferences(Constants.SETTINGS_FILE, 0);
+            delayM = settings.getInt(Constants.DATA_KA, 1 /* default lkg */);
+        }
 
         //
         // schedule a connection attempt, one minute from now.
         //
         alarm.set(
             AlarmManager.RTC_WAKEUP,
-            System.currentTimeMillis() + 1 * 60 * 1000,
+            System.currentTimeMillis() + delayM * 60 * 1000,
             PendingIntent.getBroadcast(this, 0, new Intent(Constants.ACTION_SEND_DATA_KA), PendingIntent.FLAG_UPDATE_CURRENT)
             );
     }
