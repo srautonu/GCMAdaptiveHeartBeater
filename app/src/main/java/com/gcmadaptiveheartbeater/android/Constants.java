@@ -9,6 +9,7 @@ public class Constants {
     //
     // Intent/action names
     //
+    public final static String ACTION_END_EXPERIMENT = "com.gcmadaptiveheartbeater.android.END_EXPERIMENT";
     public final static String ACTION_SEND_DATA_KA = "com.gcmadaptiveheartbeater.android.SEND_GCM_KA";
     public final static String ACTION_SEND_TEST_KA           = "com.gcmadaptiveheartbeater.android.SEND_TEST_KA";
     public final static String ACTION_START_KA_TESTING       = "com.gcmadaptiveheartbeater.android.START_KA_TESTING";

@@ -59,6 +59,8 @@ public class KADataService extends StickyIntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        if (!SettingsUtil.isExperimentRunning(this))
+            return;
 
         if (intent == null) {
             Log("null intent. Still proceeding.");

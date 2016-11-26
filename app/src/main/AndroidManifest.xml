@@ -40,6 +40,7 @@
         KADataService
         <receiver android:name=".BackGroundServices.SystemEventsReceiver">
             <intent-filter>
+                <action android:name="com.gcmadaptiveheartbeater.android.END_EXPERIMENT" />
                 <action android:name="com.gcmadaptiveheartbeater.android.SEND_GCM_KA" />
                 <action android:name="com.gcmadaptiveheartbeater.android.START_KA_TESTING" />
                 <action android:name="com.gcmadaptiveheartbeater.android.SEND_TEST_KA" />

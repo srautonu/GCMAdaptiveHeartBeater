@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
@@ -19,6 +20,7 @@ import android.widget.TextView;
 
 import com.gcmadaptiveheartbeater.android.BackGroundServices.KADataService;
 import com.gcmadaptiveheartbeater.android.BackGroundServices.KATesterService;
+import com.gcmadaptiveheartbeater.android.BackGroundServices.ServicesMgr;
 
 
 /**
@@ -28,7 +30,6 @@ import com.gcmadaptiveheartbeater.android.BackGroundServices.KATesterService;
 public class Commands extends Fragment {
     TextView _deviceId;
     Button _expToggleBtn;
-    int _expTogglerState;
     Spinner _deviceIdSpinner;
     Spinner _expModelSpinner;
     Spinner _heartBeatRateSpinner;
@@ -47,144 +48,61 @@ public class Commands extends Fragment {
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        boolean fExpRunning = SettingsUtil.isExperimentRunning(getContext());
 
         View view = (RelativeLayout) inflater.inflate(R.layout.fragment_commands, container, false);
 
         _deviceIdSpinner = (Spinner) view.findViewById(R.id.deviceIdSpinner);
+        _deviceIdSpinner.setEnabled(!fExpRunning);
+
         _expModelSpinner = (Spinner) view.findViewById(R.id.expModelSpinner);
+        _expModelSpinner.setEnabled(!fExpRunning);
+
         _heartBeatRateSpinner = (Spinner) view.findViewById(R.id.heartBeatRateSpinner);
+        _heartBeatRateSpinner.setEnabled(!fExpRunning);
 
         _expToggleBtn = (Button) view.findViewById(R.id.expToggleBtn);
-
-        if (SettingsUtil.isExperimentRunning(getContext()))
-        {
-            _expTogglerState = 1;
-        }
-        else
-        {
-            _expTogglerState = 0;
-        }
-        _expToggleBtn.setText(_strExpToggler[_expTogglerState]);
+        _expToggleBtn.setText(_strExpToggler[SettingsUtil.isExperimentRunning(getContext()) ? 1 : 0]);
 
         _expToggleBtn.setOnClickListener(
             new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    _expTogglerState = (_expTogglerState + 1) % 2;
-                    _expToggleBtn.setText(_strExpToggler[_expTogglerState]);
-
                     if (SettingsUtil.isExperimentRunning(getContext()))
                     {
-                        //
-                        // If experiment is already running, a click performs stop action
-                        //
-                        if (SettingsUtil.getExpModel(getContext()) == Constants.EXP_MODEL_ADAPTIVE)
-                        {
-                            stopTestKA();
-                        }
+                        // Change the text in the start/end experiment button
+                        _expToggleBtn.setText(_strExpToggler[0]);
 
-                        stopDataKA();
+                        _deviceIdSpinner.setEnabled(true);
+                        _expModelSpinner.setEnabled(true);
+                        _heartBeatRateSpinner.setEnabled(true);
 
-                        SettingsUtil.setExperimentRunning(getContext(), false);
+                        ServicesMgr.endExperiment(getContext());
                     }
                     else // start experiment
                     {
-                        //
-                        // Clear all cached settings
-                        //
-                        getContext().getSharedPreferences(Constants.SETTINGS_FILE, 0).edit().clear().commit();
+                        _expToggleBtn.setText(_strExpToggler[1]);
 
-                        // broadcast the trigger to update all the tabs with settings info
-                        LocalBroadcastManager.getInstance(getContext()).sendBroadcast(
-                                new Intent(Constants.ACTION_HANDLE_SETTINGS_UPDATE)
-                            );
+                        _deviceIdSpinner.setEnabled(false);
+                        _expModelSpinner.setEnabled(false);
+                        _heartBeatRateSpinner.setEnabled(false);
 
-                        //
-                        // Mark experiment running
-                        //
-                        SettingsUtil.setExperimentRunning(getContext(), true);
-
-                        SettingsUtil.putDeviceId(getContext(), _deviceIdSpinner.getSelectedItem().toString());
-
+                        String strDeviceId = _deviceIdSpinner.getSelectedItem().toString();
                         int expModel = 1 + (int)_expModelSpinner.getSelectedItemId();
-                        SettingsUtil.putExpModel(getContext(), expModel);
+                        int dataKaRateM = 0;
+
                         if (expModel == Constants.EXP_MODEL_FIXED_RATE)
                         {
-                            SettingsUtil.updateSetting(
-                                getContext(),
-                                Constants.DATA_KA,
-                                Integer.parseInt(_heartBeatRateSpinner.getSelectedItem().toString())
-                                );
+                            dataKaRateM = Integer.parseInt(_heartBeatRateSpinner.getSelectedItem().toString());
                         }
 
-                        //setupMocks();
-
-
-                        startDataKA();
-                        if (expModel == Constants.EXP_MODEL_ADAPTIVE)
-                        {
-                            startTestKA();
-                        }
-                  }
+                        ServicesMgr.startExperiment(getContext(), strDeviceId, expModel, dataKaRateM);
+                    }
                 }
             }
         );
 
         return view;
-    }
-
-    // request a DATA KA immediately
-    private void startDataKA()
-    {
-        AlarmManager alarm = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
-
-        // Set up an alarm for immediate trigger
-        alarm.set(
-            AlarmManager.RTC_WAKEUP,
-            System.currentTimeMillis(),
-            PendingIntent.getBroadcast(getContext(), 0, new Intent(Constants.ACTION_SEND_DATA_KA), PendingIntent.FLAG_UPDATE_CURRENT)
-        );
-    }
-
-    private void stopDataKA()
-    {
-        AlarmManager alarm = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
-        Intent mServiceIntent = new Intent(getContext(), KADataService.class);
-
-        Intent intentDataKA = new Intent(Constants.ACTION_SEND_DATA_KA);
-        PendingIntent piDataKA = PendingIntent.getBroadcast(getContext(), 0, intentDataKA, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        alarm.cancel(piDataKA);
-
-        getContext().stopService(mServiceIntent);
-    }
-
-    private void startTestKA()
-    {
-        AlarmManager alarm = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
-
-        Intent intentStartKA = new Intent(Constants.ACTION_START_KA_TESTING);
-        PendingIntent piStartKA = PendingIntent.getBroadcast(getContext(), 0, intentStartKA, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        // Set up an alarm for immediate trigger
-        alarm.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), piStartKA);
-    }
-
-    private void stopTestKA()
-    {
-        AlarmManager alarm = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
-
-        Intent intentSendKA = new Intent(Constants.ACTION_SEND_TEST_KA);
-        Intent intentStartKA = new Intent(Constants.ACTION_START_KA_TESTING);
-        Intent mServiceIntent = new Intent(getContext(), KATesterService.class);
-
-        PendingIntent piSendKA = PendingIntent.getBroadcast(getContext(), 0, intentSendKA, PendingIntent.FLAG_UPDATE_CURRENT);
-        PendingIntent piStartKA = PendingIntent.getBroadcast(getContext(), 0, intentStartKA, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        alarm.cancel(piSendKA);
-        alarm.cancel(piStartKA);
-
-        getContext().stopService(mServiceIntent);
     }
 }
 

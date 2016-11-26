@@ -28,11 +28,16 @@ public class SystemEventsReceiver extends WakefulBroadcastReceiver
 
         System.out.println("Action: " + strAction);
 
-        boolean isConnected = NetworkUtil.isConnected(context);
+        if (strAction.equalsIgnoreCase(Constants.ACTION_END_EXPERIMENT))
+        {
+            ServicesMgr.endExperiment(context);
+            return;
+        }
 
         //
         // No point sending/scheduling test/GCM KA if we are not connected
         //
+        boolean isConnected = NetworkUtil.isConnected(context);
         if (!isConnected && !strAction.equalsIgnoreCase("android.net.conn.CONNECTIVITY_CHANGE"))
         {
             System.out.println("Ignoring action, as we are not connected.");
