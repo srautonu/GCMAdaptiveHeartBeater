@@ -1,3 +1,9 @@
+//
+// This code is written based on code from Android's IntentService code. The IntentService is
+// not sticky. (Once an intent is handled, the service gets terminated). But, to maintain a long
+// running TCP connection, we need the service to stick around. As such, StickyIntentService
+// continues to exist even after an intent is handled.
+//
 package com.gcmadaptiveheartbeater.android.BackGroundServices;
 
 import android.app.Service;

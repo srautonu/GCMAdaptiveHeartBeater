@@ -1,3 +1,6 @@
+//
+// This file contains code to handle notifications from GCM
+//
 package com.gcmadaptiveheartbeater.android.BackGroundServices;
 
 import android.util.Log;

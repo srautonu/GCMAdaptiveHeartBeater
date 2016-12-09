@@ -1,3 +1,6 @@
+//
+// This file contains code to start/stop different services.
+//
 package com.gcmadaptiveheartbeater.android.BackGroundServices;
 
 import android.app.AlarmManager;

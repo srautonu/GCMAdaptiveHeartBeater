@@ -1,3 +1,6 @@
+//
+// This file contains code for KA interval testing.
+//
 package com.gcmadaptiveheartbeater.android.BackGroundServices;
 
 import android.app.AlarmManager;
@@ -13,9 +16,6 @@ import com.gcmadaptiveheartbeater.android.SettingsUtil;
 
 import java.io.*;
 import java.net.*;
-
-// kopottakha.cs.uiuc.edu:8080
-// www.ekngine.com:5228
 
 /**
  * Created by mrahman on 24-Oct-16.

@@ -1,3 +1,6 @@
+//
+// This file implements a service for the long running notification channel connection
+//
 package com.gcmadaptiveheartbeater.android.BackGroundServices;
 
 import android.app.AlarmManager;

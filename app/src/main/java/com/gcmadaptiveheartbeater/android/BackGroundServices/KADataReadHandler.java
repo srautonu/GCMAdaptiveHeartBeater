@@ -1,10 +1,12 @@
+//
+// This file contains code for reading from the custom notification service.
+//
+
 package com.gcmadaptiveheartbeater.android.BackGroundServices;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.util.Log;
 
-import com.gcmadaptiveheartbeater.android.Constants;
 import com.gcmadaptiveheartbeater.android.SettingsUtil;
 
 import java.io.*;

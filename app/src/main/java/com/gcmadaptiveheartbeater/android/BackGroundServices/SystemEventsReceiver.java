@@ -1,3 +1,8 @@
+//
+// This file handles different system events (connectivity) as well as different custom
+// actions that are scheduled via AlarmManager. It extends WakefulBroadcastReceiver
+// as wake lock may be needed to complete certain tasks.
+//
 package com.gcmadaptiveheartbeater.android.BackGroundServices;
 
 import android.app.AlarmManager;
