@@ -5,11 +5,10 @@ Originally, the code was written to adaptively update the heartbeat interval of 
 
 To compile and run the code, kindly launch in Android Studio.
 
-To point the KA interval testing code to your own server, please change the first 2 lines of BackGroundServices.KATesterSerService class
-    String m_strServerDNS = "Your_Server_Name_Here";
-    int m_serverPort = Your_Port_Here;
+To point the KA interval testing code to your own server, please change the first 2 lines of BackGroundServices.KATesterSerService class<br/>
+    String m_strServerDNS = "Your_Server_Name_Here";<br/>
+    int m_serverPort = Your_Port_Here;<br/>
 
-To point the custom notification service code to your own server, please change the first 2 lines of BackGroundServices.KADataService class
-(You will also need to run our custom notification server code at your server)
-    String _strServerDNS = "Your_Server_Name_Here";
-    int _serverPort = Your_Port_Here;
+To point the custom notification service code to your own server, please change the first 2 lines of BackGroundServices.KADataService class (You will also need to run our custom notification server code at your server)<br/>
+    String _strServerDNS = "Your_Server_Name_Here";<br/>
+    int _serverPort = Your_Port_Here;<br/>
