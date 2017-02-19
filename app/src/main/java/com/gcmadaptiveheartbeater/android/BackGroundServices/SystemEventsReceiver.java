@@ -113,7 +113,8 @@ public class SystemEventsReceiver extends WakefulBroadcastReceiver
 
     private void sendDataKA(Context context)
     {
-        startWakefulService(context, new Intent(Constants.ACTION_SEND_DATA_KA).setPackage(BuildConfig.APPLICATION_ID));
+        //startWakefulService(context, new Intent(Constants.ACTION_SEND_DATA_KA).setPackage(BuildConfig.APPLICATION_ID));
+        sendGCMKA(context);
     }
 
     private void scheduleDataKA(Context context, int delayM)
