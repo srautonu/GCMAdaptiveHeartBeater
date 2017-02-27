@@ -41,7 +41,10 @@ public class ServicesMgr {
 
         startExperimentClock(context);
 
-        startDataKA(context);
+        if (expModel != Constants.EXP_MODEL_ANDROID) {
+            startDataKA(context);
+        }
+
         if (expModel == Constants.EXP_MODEL_ADAPTIVE)
         {
             startTestKA(context);
@@ -50,12 +53,16 @@ public class ServicesMgr {
 
     public static void endExperiment(Context context)
     {
-        if (SettingsUtil.getExpModel(context) == Constants.EXP_MODEL_ADAPTIVE)
+        int expModel = SettingsUtil.getExpModel(context);
+
+        if (expModel == Constants.EXP_MODEL_ADAPTIVE)
         {
             stopTestKA(context);
         }
 
-        stopDataKA(context);
+        if (expModel != Constants.EXP_MODEL_ANDROID) {
+            stopDataKA(context);
+        }
 
         SettingsUtil.setExperimentRunning(context, false);
     }

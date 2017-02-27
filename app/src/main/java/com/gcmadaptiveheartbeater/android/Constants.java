@@ -93,4 +93,5 @@ public class Constants {
     //
     public final static int EXP_MODEL_ADAPTIVE = 1;
     public final static int EXP_MODEL_FIXED_RATE = 2;
+    public final static int EXP_MODEL_ANDROID = 3;
 }

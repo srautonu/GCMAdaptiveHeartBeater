@@ -23,11 +23,9 @@ public class SettingsUtil {
     public static int getExpModel(Context context)
     {
         //
-        // Model #1: Android as is. No KA testing, No additional GCM KA
-        // Model #2: Agressive GCM KA (1 minute). No KA Testing
-        // Model #3: KA testing. GCM Adaptive KA
-        //
-        // Default to Model 3 (Adaptive KA)
+        // Model #1: Adaptive KA scheme
+        // Model #2: Fixed rate KA scheme. No KA Testing
+        // Model #3: Android as is. No KA testing, No additional GCM KA
         //
         return context.getSharedPreferences(Constants.SETTINGS_FILE, 0).getInt(Constants.EXP_MODEL, 3);
     }

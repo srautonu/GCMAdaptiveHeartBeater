@@ -4,6 +4,7 @@
     <string-array name="expModels">
         <item>Adaptive (Composite)</item>
         <item>Fixed rate</item>
+        <item>Android</item>
     </string-array>
     <string-array name="heartBeatRates">
         <item>4</item>
