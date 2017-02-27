@@ -30,33 +30,6 @@ public class TokenRefreshHandler extends FirebaseInstanceIdService
     }
 
     private void sendRegistrationToServer(String refreshedToken) {
-//        final String strServerDNS = "www.ekngine.com";
-//        final int serverPort = 8080;
-//
-//        String deviceName = getSharedPreferences(Constants.SETTINGS_FILE, 0).getString(Constants.DEVICE_NAME, "");
-//        if (deviceName.isEmpty())
-//            return;
-
-//        try {
-//            System.out.println("Connecting to " + strServerDNS + ":" + serverPort + "...\n");
-//
-//            Socket sock = new Socket(strServerDNS, serverPort);
-//            DataOutputStream sock_out = new DataOutputStream(sock.getOutputStream());
-//            //
-//            // Set the socket read timeout to 30 seconds.
-//            //
-//            sock.setSoTimeout(30 * 1000);
-//            sock_out.writeBytes("DVC " + deviceName + " " + refreshedToken);
-//            sock_out.close();
-//            sock.close();
-//
-//            System.out.println("Done.\n");
-//        }
-//        catch (IOException e)
-//        {
-//            System.out.println(e);
-//
-//        }
 
     }
 }
