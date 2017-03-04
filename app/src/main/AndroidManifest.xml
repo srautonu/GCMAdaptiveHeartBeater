@@ -37,7 +37,6 @@
             </intent-filter>
         </service>
 
-        KADataService
         <receiver android:name=".BackGroundServices.SystemEventsReceiver">
             <intent-filter>
                 <action android:name="com.gcmadaptiveheartbeater.android.END_EXPERIMENT" />
@@ -50,4 +49,5 @@
     </application>
 
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.BATTERY_STATS" />
 </manifest>
