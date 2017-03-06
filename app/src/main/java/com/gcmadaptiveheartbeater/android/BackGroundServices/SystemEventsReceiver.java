@@ -84,7 +84,9 @@ public class SystemEventsReceiver extends WakefulBroadcastReceiver
             {
                 int expModel = SettingsUtil.getExpModel(context);
 
-                scheduleDataKA(context, 1);
+                if (expModel != Constants.EXP_MODEL_ANDROID) {
+                    scheduleDataKA(context, 1);
+                }
                 if (expModel == Constants.EXP_MODEL_ADAPTIVE) {
                     scheduleTestKA(context, 1);
                 }
