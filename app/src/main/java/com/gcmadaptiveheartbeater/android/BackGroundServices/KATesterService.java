@@ -46,6 +46,13 @@ public class KATesterService extends StickyIntentService
     @Override
     protected void onHandleIntent(Intent intent)
     {
+        //
+        // If experiment is not running, or the KA model is anything other than
+        // adaptive (Model #1), then we ignore any spurious intent
+        //
+        if (!SettingsUtil.isExperimentRunning(this) || 1 != SettingsUtil.getExpModel(this))
+            return;
+
         String strAction = null;
 
         // UNKNOWN CAUSE: We are still seeing unknown intent come in if the app
