@@ -50,7 +50,7 @@ public class KATesterService extends StickyIntentService
         // If experiment is not running, or the KA model is anything other than
         // adaptive (Model #1), then we ignore any spurious intent
         //
-        if (!SettingsUtil.isExperimentRunning(this) || 1 != SettingsUtil.getExpModel(this))
+        if (!SettingsUtil.isExperimentRunning(this) || Constants.EXP_MODEL_ADAPTIVE != SettingsUtil.getExpModel(this))
             return;
 
         String strAction = null;
